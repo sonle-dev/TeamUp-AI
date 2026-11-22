@@ -1,0 +1,15 @@
+# Dependencies & Virtual Envs
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+env/
+
+# Environment Variables & Secrets
+.env
+*.key
+
+# Temporary files & logs
+*.log
+*.tmp
+temp/

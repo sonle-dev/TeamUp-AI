@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeamUp Meet - Phòng Họp & Điều Phối AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #121212;
+      --bg-tile: #202124;
+      --bg-panel: #1e1f20;
+      --bg-panel-sub: #191a1b;
+      --bg-input: #121212;
+      --bg-card: #282a2d;
+      --text-main: #e3e3e3;
+      --text-sub: #9aa0a6;
+      --border-color: #3c4043;
+      --btn-control: #3c4043;
+      --btn-control-text: #ffffff;
+      --btn-control-hover: #474a4d;
+      --header-bg: #121212;
+      --footer-bg: #121212;
+    }
+
+    .theme-light {
+      --bg-main: #f0f2f5;
+      --bg-tile: #ffffff;
+      --bg-panel: #ffffff;
+      --bg-panel-sub: #f8f9fa;
+      --bg-input: #f8f9fa;
+      --bg-card: #f8f9fa;
+      --text-main: #202124;
+      --text-sub: #5f6368;
+      --border-color: #dadce0;
+      --btn-control: #ffffff;
+      --btn-control-text: #3c4043;
+      --btn-control-hover: #f1f3f4;
+      --header-bg: #ffffff;
+      --footer-bg: #ffffff;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Google Sans', Roboto, -apple-system, sans-serif;
+      overflow: hidden;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    .meet-btn {
+      width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background-color: var(--btn-control); color: var(--btn-control-text); transition: all 0.2s;
+      border: 1px solid var(--border-color);
+    }
+    .meet-btn:hover { background-color: var(--btn-control-hover); }
+    .meet-btn.active { background-color: #ea4335 !important; color: white !important; border-color: #ea4335; }
+    .meet-btn.accent { background-color: #8ab4f8 !important; color: #202124 !important; }
+
+    .tile {
+      background-color: var(--bg-tile);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .theme-panel {
+      background-color: var(--bg-panel);
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+
+    .floating-reaction {
+      position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+      font-size: 28px; animation: floatUp 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; pointer-events: none;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.6); }
+      50% { transform: translate(-50%, -100px) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -200px) scale(1); }
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between">
+
+  <!-- TOP BAR (Google Meet Style with Theme Switcher) -->
+  <header style="background-color: var(--header-bg); border-bottom: 1px solid var(--border-color);" class="h-14 px-5 flex items-center justify-between z-10 select-none transition-colors">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium" id="meetingClock">23:45</span>
+        <span class="text-slate-400">|</span>
+        <span class="text-sm font-semibold">teamup-dev-warroom</span>
+        <span class="px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-600/50 text-emerald-400 text-[11px] flex items-center gap-1.5 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Trực tiếp
+        </span>
+      </div>
+    </div>
+
+    <!-- Center: Pomodoro Focus Widget -->
+    <div class="flex items-center gap-2 px-3 py-1 rounded-full border shadow-sm" style="background-color: var(--bg-card); border-color: var(--border-color);">
+      <i class="fa-solid fa-stopwatch text-indigo-500 text-xs"></i>
+      <span id="pomoTimer" class="font-mono text-xs font-bold tracking-wider">25:00</span>
+      <button onclick="togglePomodoro()" id="btnPomoToggle" class="text-[11px] text-indigo-500 hover:text-indigo-600 px-2 py-0.5 rounded font-medium transition">
+        Bắt đầu
+      </button>
+    </div>
+
+    <!-- Right: Theme Switcher & Status -->
+    <div class="flex items-center gap-2.5">
+      <!-- THEME SELECTOR DROPDOWN (Sáng / Tối / Theo hệ thống) -->
+      <div class="flex items-center rounded-xl p-0.5 border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+        <button onclick="changeTheme('light')" id="btnThemeLight" class="px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 transition" title="Giao diện Sáng (Trắng)">
+          <i class="fa-solid fa-sun text-amber-500"></i> <span class="hidden sm:inline text-[11px]">Sáng</span>
+        </button>
+        <button onclick="changeTheme('dark')" id="btnThemeDark" class="px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 transition" title="Giao diện Tối (Đen)">
+          <i class="fa-solid fa-moon text-indigo-400"></i> <span class="hidden sm:inline text-[11px]">Tối</span>
+        </button>
+        <button onclick="changeTheme('system')" id="btnThemeSystem" class="px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 transition" title="Theo hệ thống (Auto)">
+          <i class="fa-solid fa-desktop text-slate-400"></i> <span class="hidden sm:inline text-[11px]">Hệ thống</span>
+        </button>
+      </div>
+
+      <div id="apiStatusBadge" class="px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-600/50 text-emerald-400 text-xs flex items-center gap-1.5 font-medium">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i> AI Sẵn sàng
+      </div>
+
+      <button onclick="openConfigModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition border" style="background-color: var(--bg-card); border-color: var(--border-color);" title="Cài đặt API Key">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN STAGE (Video Grid + Slide-Over Side Panel) -->
+  <div class="flex-1 flex overflow-hidden px-4 py-2 gap-3 relative">
+
+    <!-- LEFT AREA: VIDEO TILES (Google Meet Stage) -->
+    <main id="videoStage" class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 h-full transition-all duration-300">
+      
+      <!-- TILE 1: YOU (Camera / Screen Share / Avatar) -->
+      <div class="tile group">
+        <video id="localVideo" autoplay playsinline muted class="w-full h-full object-cover hidden"></video>
+
+        <div id="localAvatar" class="flex flex-col items-center justify-center gap-3">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4" style="ring-color: var(--border-color);">
+            SL
+          </div>
+          <span class="text-sm font-medium" style="color: var(--text-sub);">Camera đang tắt</span>
+        </div>
+
+        <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-xs text-white">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Sơn Lê (Bạn - Leader)</span>
+          <i id="tileMicIcon" class="fa-solid fa-microphone text-[10px] text-slate-300 ml-1"></i>
+        </div>
+      </div>
+
+      <!-- TILE 2: PEER 1 (Đức Nguyễn - Backend Dev) -->
+      <div class="tile">
+        <div class="flex flex-col items-center justify-center gap-3">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4" style="ring-color: var(--border-color);">
+            ĐN
+          </div>
+          <div class="flex items-center gap-1.5 text-xs" style="color: var(--text-sub);">
+            <span class="px-2 py-0.5 rounded font-mono text-[10px] border" style="background-color: var(--bg-card); border-color: var(--border-color); color: #0284c7;">Backend AWS</span>
+          </div>
+        </div>
+        <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-xs text-white">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Đức Nguyễn</span>
+          <i class="fa-solid fa-microphone-slash text-[10px] text-rose-400 ml-1"></i>
+        </div>
+      </div>
+
+      <!-- TILE 3: PEER 2 (Minh Hoàng - Frontend Dev) -->
+      <div class="tile">
+        <div class="flex flex-col items-center justify-center gap-3">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-600 to-rose-600 flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4" style="ring-color: var(--border-color);">
+            MH
+          </div>
+          <div class="flex items-center gap-1.5 text-xs" style="color: var(--text-sub);">
+            <span class="px-2 py-0.5 rounded font-mono text-[10px] border" style="background-color: var(--bg-card); border-color: var(--border-color); color: #ea580c;">Frontend React</span>
+          </div>
+        </div>
+        <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-xs text-white">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Minh Hoàng</span>
+          <i class="fa-solid fa-microphone text-[10px] text-slate-300 ml-1"></i>
+        </div>
+      </div>
+
+      <!-- TILE 4: SMART COPILOT TILE (AI Assistant View) -->
+      <div class="tile">
+        <div class="flex flex-col items-center justify-center gap-2 text-center p-6">
+          <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-500 text-2xl mb-1 shadow-sm">
+            <i class="fa-solid fa-brain animate-pulse"></i>
+          </div>
+          <h3 class="text-sm font-semibold">Trợ Lý AI Phòng Họp</h3>
+          <p class="text-xs max-w-xs leading-relaxed" style="color: var(--text-sub);" id="copilotStatus">
+            Đang lắng nghe cuộc họp... Mở Sidebar bên phải để AI tự chia việc hoặc cứu bug.
+          </p>
+        </div>
+        <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-800 text-xs text-indigo-300">
+          <i class="fa-solid fa-sparkles text-amber-400"></i>
+          <span>TeamUp Copilot (Gemini 3.1)</span>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDE-OVER PANEL: AI TOOLS & KANBAN (Slide-over Drawer) -->
+    <aside id="sidePanel" class="w-96 rounded-2xl border flex flex-col h-full shadow-xl transition-all duration-300" style="background-color: var(--bg-panel); border-color: var(--border-color);">
+      
+      <!-- Panel Header -->
+      <div class="h-14 px-4 border-b flex items-center justify-between" style="border-color: var(--border-color);">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-indigo-500 text-sm"></i>
+          <h2 class="text-sm font-semibold">Bảng Điều Phối AI</h2>
+        </div>
+        <button onclick="toggleSidePanel()" class="w-8 h-8 rounded-full flex items-center justify-center transition" style="color: var(--text-sub);">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Panel Tabs -->
+      <div class="flex border-b text-xs" style="background-color: var(--bg-panel-sub); border-color: var(--border-color);">
+        <button onclick="setTab('kanban')" id="tabBtn-kanban" class="flex-1 py-2.5 font-medium border-b-2 border-indigo-500 text-indigo-500 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-table-columns"></i> Kanban
+        </button>
+        <button onclick="setTab('sos')" id="tabBtn-sos" class="flex-1 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-bug text-rose-500"></i> SOS Bug
+        </button>
+        <button onclick="setTab('git')" id="tabBtn-git" class="flex-1 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5">
+          <i class="fa-brands fa-github text-emerald-500"></i> Git Feed
+        </button>
+      </div>
+
+      <!-- TAB 1: KANBAN & CHIA VIỆC TỰ ĐỘNG -->
+      <div id="panel-kanban" class="flex-1 p-3.5 overflow-y-auto space-y-3">
+        <div class="rounded-xl p-3 border space-y-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-semibold">Đề tài / Nhiệm vụ tuần:</span>
+            <button onclick="loadSampleSyllabus()" class="text-[11px] text-indigo-500 hover:underline">
+              Nạp đề bài mẫu
+            </button>
+          </div>
+          <textarea id="taskInputText" rows="3" placeholder="Dán đề bài hoặc nội dung cuộc họp..." 
+            class="w-full border rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);"></textarea>
+          <button onclick="runAutoDecompose()" id="btnDecompose" class="w-full py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition shadow">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Tự Động Phân Việc
+          </button>
+        </div>
+
+        <!-- Rendered Kanban Cards -->
+        <div class="space-y-3" id="kanbanCardsList">
+          <div class="text-[11px] font-bold uppercase tracking-wider flex justify-between items-center px-1" style="color: var(--text-sub);">
+            <span>Danh sách Thẻ Việc</span>
+            <span id="kanbanCountBadge" class="text-indigo-500 font-mono text-[10px]">0 thẻ</span>
+          </div>
+          <div id="cardsContainer" class="space-y-2 text-xs">
+            <div class="text-center py-8 text-xs" style="color: var(--text-sub);">
+              <i class="fa-solid fa-clipboard-list text-2xl mb-2 block opacity-40"></i>
+              Chưa có thẻ nào. Bấm "AI Tự Động Phân Việc" ở trên để tạo.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: SOS CỨU BUG KHẨN CẤP -->
+      <div id="panel-sos" class="flex-1 p-3.5 overflow-y-auto space-y-3 hidden">
+        <div class="rounded-xl p-3 border space-y-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-semibold text-rose-500">Dán Log lỗi StackTrace:</span>
+            <button onclick="loadSampleError()" class="text-[11px] text-rose-500 hover:underline">
+              Nạp lỗi mẫu
+            </button>
+          </div>
+          <textarea id="errorInputText" rows="4" placeholder="TypeError: Cannot read properties..." 
+            class="w-full border rounded-lg p-2 font-mono text-[11px] focus:outline-none focus:border-rose-500" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);"></textarea>
+          <button onclick="runSOSDebugger()" id="btnDebug" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition shadow">
+            <i class="fa-solid fa-life-ring"></i> AI Cứu Bug Khẩn Cấp (SOS)
+          </button>
+        </div>
+
+        <div id="sosResultBox" class="hidden rounded-xl p-3 border space-y-1.5" style="background-color: var(--bg-card); border-color: var(--border-color);">
+          <span class="text-xs font-bold uppercase" style="color: var(--text-sub);">Giải pháp từ AI:</span>
+          <div id="sosSolution" class="text-xs whitespace-pre-wrap leading-relaxed font-mono text-[11px] p-2.5 rounded-lg border" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: GIT LIVE FEED & LEAK GUARD -->
+      <div id="panel-git" class="flex-1 p-3.5 overflow-y-auto space-y-3 hidden">
+        <div class="rounded-xl p-3 border space-y-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-semibold text-emerald-500">Giả lập Commit Diff:</span>
+            <button onclick="loadSampleCommit()" class="text-[11px] text-emerald-500 hover:underline">
+              Nạp commit mẫu (Có leak)
+            </button>
+          </div>
+          <textarea id="gitInputText" rows="3" placeholder="Paste commit diff..." 
+            class="w-full border rounded-lg p-2 font-mono text-[11px] focus:outline-none focus:border-emerald-500" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);"></textarea>
+          <button onclick="runGitGuard()" id="btnGitScan" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition shadow">
+            <i class="fa-solid fa-shield-virus"></i> Quét Mã & Tóm Tắt
+          </button>
+        </div>
+
+        <div id="gitAlertBox" class="hidden space-y-2">
+          <div id="gitLeakMessage" class="p-2.5 rounded-lg border text-xs"></div>
+          <div class="p-2.5 rounded-lg border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <span class="text-[10px] font-bold uppercase block mb-1" style="color: var(--text-sub);">Tóm tắt kiểu Gen Z:</span>
+            <p id="gitGenZSummary" class="text-xs"></p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- FLOATING BOTTOM CONTROL DOCK (Exact Google Meet Pill Bar) -->
+  <footer style="background-color: var(--footer-bg); border-top: 1px solid var(--border-color);" class="h-20 px-6 flex items-center justify-between select-none relative transition-colors">
+    
+    <!-- Left: Meeting Code -->
+    <div class="flex items-center gap-2 text-sm">
+      <span class="font-medium">avh-qfxt-hdy</span>
+      <button onclick="copyMeetingLink()" class="text-xs hover:text-indigo-500" style="color: var(--text-sub);" title="Sao chép link">
+        <i class="fa-regular fa-copy"></i>
+      </button>
+    </div>
+
+    <!-- Center: Main Meeting Controls -->
+    <div class="flex items-center gap-3">
+      <button onclick="toggleMic()" id="btnMic" class="meet-btn" title="Bật/Tắt Mic">
+        <i class="fa-solid fa-microphone text-sm"></i>
+      </button>
+
+      <button onclick="toggleCam()" id="btnCam" class="meet-btn" title="Bật/Tắt Camera">
+        <i class="fa-solid fa-video text-sm"></i>
+      </button>
+
+      <button onclick="toggleScreenShare()" id="btnScreen" class="meet-btn" title="Chia sẻ màn hình">
+        <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
+      </button>
+
+      <!-- Floating Reactions Trigger -->
+      <div class="relative">
+        <button onclick="toggleReactionMenu()" id="btnReaction" class="meet-btn" title="Thả cảm xúc">
+          <i class="fa-regular fa-face-smile text-sm"></i>
+        </button>
+        <div id="reactionMenu" class="hidden absolute bottom-14 left-1/2 -translate-x-1/2 px-3 py-2 rounded-full border shadow-2xl flex items-center gap-2 text-lg" style="background-color: var(--bg-tile); border-color: var(--border-color);">
+          <button onclick="sendReaction('🔥')" class="hover:scale-125 transition">🔥</button>
+          <button onclick="sendReaction('🚀')" class="hover:scale-125 transition">🚀</button>
+          <button onclick="sendReaction('❤️')" class="hover:scale-125 transition">❤️</button>
+          <button onclick="sendReaction('🎉')" class="hover:scale-125 transition">🎉</button>
+          <button onclick="sendReaction('💀')" class="hover:scale-125 transition">💀</button>
+        </div>
+      </div>
+
+      <!-- End Call Red Pill Button -->
+      <button onclick="leaveCall()" class="px-6 h-11 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md shadow-rose-600/30" title="Rời cuộc gọi">
+        <i class="fa-solid fa-phone-slash text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Right: Drawer Toggles -->
+    <div class="flex items-center gap-2">
+      <button onclick="toggleSidePanel()" id="btnSidePanelToggle" class="meet-btn active" title="Mở Bảng Điều Phối AI">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+      </button>
+      <button onclick="alert('3 thành viên đang trong phòng: Sơn Lê, Đức Nguyễn, Minh Hoàng')" class="meet-btn" title="Thành viên">
+        <i class="fa-solid fa-user-group text-sm"></i>
+      </button>
+    </div>
+
+  </footer>
+
+  <!-- CONFIG MODAL (Gemini API Key) -->
+  <div id="configModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4 border" style="background-color: var(--bg-panel); border-color: var(--border-color);">
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold flex items-center gap-2">
+          <i class="fa-solid fa-gear text-indigo-500"></i> Cài Đặt API Gemini
+        </h3>
+        <button onclick="closeConfigModal()" style="color: var(--text-sub);">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">Google Gemini API Key:</label>
+        <input type="password" id="modalApiKeyInput" class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">Chọn Model:</label>
+        <select id="modalModelSelect" class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
+          <option value="gemini-3.1-flash-lite" selected>gemini-3.1-flash-lite (Khuyên dùng: Siêu nhanh)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash (Mới nhất)</option>
+          <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+          <option value="gemini-flash-latest">gemini-flash-latest</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeConfigModal()" class="px-4 py-2 border rounded-xl text-xs" style="background-color: var(--bg-card); border-color: var(--border-color);">Đóng</button>
+        <button onclick="saveModalKey()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold">Lưu lại</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    let localStream = null;
+    let isMicOn = true;
+    let isCamOn = false;
+    let isScreenSharing = false;
+    let sidePanelOpen = true;
+    let pomoInterval = null;
+    let pomoSeconds = 25 * 60;
+    let isPomoRunning = false;
+
+    // THEME MANAGEMENT (Light, Dark, System Auto)
+    function changeTheme(mode) {
+      localStorage.setItem("teamup_theme_mode", mode);
+      applyTheme(mode);
+    }
+
+    function applyTheme(mode) {
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const effectiveDark = mode === 'dark' || (mode === 'system' && isSystemDark);
+
+      if (effectiveDark) {
+        document.documentElement.classList.remove('theme-light');
+      } else {
+        document.documentElement.classList.add('theme-light');
+      }
+
+      // Update button active styles
+      const btnLight = document.getElementById("btnThemeLight");
+      const btnDark = document.getElementById("btnThemeDark");
+      const btnSys = document.getElementById("btnThemeSystem");
+
+      [btnLight, btnDark, btnSys].forEach(b => {
+        b.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 transition text-slate-400 hover:text-slate-600";
+      });
+
+      if (mode === 'light') {
+        btnLight.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 font-semibold bg-amber-500/10 text-amber-600 shadow-sm";
+      } else if (mode === 'dark') {
+        btnDark.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 font-semibold bg-indigo-500/20 text-indigo-300 shadow-sm";
+      } else {
+        btnSys.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 font-semibold bg-slate-500/20 text-slate-300 shadow-sm";
+      }
+    }
+
+    // Listen to OS system color-scheme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      const savedMode = localStorage.getItem("teamup_theme_mode") || "system";
+      if (savedMode === "system") {
+        applyTheme("system");
+      }
+    });
+
+    // Clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById("meetingClock").innerText = 
+        now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+    }, 1000);
+
+    // Init Page on Load
+    document.addEventListener("DOMContentLoaded", () => {
+      // Init Theme (default: system)
+      const savedTheme = localStorage.getItem("teamup_theme_mode") || "system";
+      applyTheme(savedTheme);
+
+      // Init Key
+      const savedKey = localStorage.getItem("teamup_gemini_api_key");
+      if (savedKey) {
+        document.getElementById("modalApiKeyInput").value = savedKey;
+      }
+    });
+
+    function getApiKey() {
+      return localStorage.getItem("teamup_gemini_api_key") || document.getElementById("modalApiKeyInput").value.trim();
+    }
+
+    function openConfigModal() { document.getElementById("configModal").classList.remove("hidden"); }
+    function closeConfigModal() { document.getElementById("configModal").classList.add("hidden"); }
+    function saveModalKey() {
+      const key = document.getElementById("modalApiKeyInput").value.trim();
+      if (key) {
+        localStorage.setItem("teamup_gemini_api_key", key);
+      }
+      closeConfigModal();
+    }
+
+    // Toggle Mic
+    function toggleMic() {
+      isMicOn = !isMicOn;
+      const btn = document.getElementById("btnMic");
+      const tileMic = document.getElementById("tileMicIcon");
+      if (isMicOn) {
+        btn.classList.remove("active");
+        btn.innerHTML = '<i class="fa-solid fa-microphone text-sm"></i>';
+        tileMic.className = "fa-solid fa-microphone text-[10px] text-slate-300 ml-1";
+      } else {
+        btn.classList.add("active");
+        btn.innerHTML = '<i class="fa-solid fa-microphone-slash text-sm"></i>';
+        tileMic.className = "fa-solid fa-microphone-slash text-[10px] text-rose-400 ml-1";
+      }
+    }
+
+    // Toggle Camera (WebCam)
+    async function toggleCam() {
+      const btn = document.getElementById("btnCam");
+      const video = document.getElementById("localVideo");
+      const avatar = document.getElementById("localAvatar");
+
+      if (!isCamOn) {
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          video.srcObject = localStream;
+          video.classList.remove("hidden");
+          avatar.classList.add("hidden");
+          btn.classList.remove("active");
+          btn.innerHTML = '<i class="fa-solid fa-video text-sm"></i>';
+          isCamOn = true;
+        } catch (e) {
+          alert("Không thể mở Webcam (quyền bị từ chối hoặc không có thiết bị).");
+        }
+      } else {
+        if (localStream) {
+          localStream.getTracks().forEach(track => track.stop());
+        }
+        video.classList.add("hidden");
+        avatar.classList.remove("hidden");
+        btn.classList.add("active");
+        btn.innerHTML = '<i class="fa-solid fa-video-slash text-sm"></i>';
+        isCamOn = false;
+      }
+    }
+
+    // Toggle Screen Share
+    async function toggleScreenShare() {
+      const video = document.getElementById("localVideo");
+      const avatar = document.getElementById("localAvatar");
+      const btn = document.getElementById("btnScreen");
+
+      if (!isScreenSharing) {
+        try {
+          const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+          video.srcObject = stream;
+          video.classList.remove("hidden");
+          avatar.classList.add("hidden");
+          btn.classList.add("accent");
+          isScreenSharing = true;
+
+          stream.getVideoTracks()[0].onended = () => {
+            toggleScreenShare();
+          };
+        } catch (e) {
+          console.warn("Screen share cancelled", e);
+        }
+      } else {
+        video.classList.add("hidden");
+        avatar.classList.remove("hidden");
+        btn.classList.remove("accent");
+        isScreenSharing = false;
+      }
+    }
+
+    // Reactions
+    function toggleReactionMenu() {
+      document.getElementById("reactionMenu").classList.toggle("hidden");
+    }
+
+    function sendReaction(emoji) {
+      document.getElementById("reactionMenu").classList.add("hidden");
+      const el = document.createElement("div");
+      el.className = "floating-reaction";
+      el.innerText = emoji;
+      document.getElementById("videoStage").appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }
+
+    // Toggle Side Panel Drawer
+    function toggleSidePanel() {
+      sidePanelOpen = !sidePanelOpen;
+      const panel = document.getElementById("sidePanel");
+      const btn = document.getElementById("btnSidePanelToggle");
+      if (sidePanelOpen) {
+        panel.classList.remove("hidden");
+        btn.classList.add("active");
+      } else {
+        panel.classList.add("hidden");
+        btn.classList.remove("active");
+      }
+    }
+
+    // Pomodoro
+    function togglePomodoro() {
+      const btn = document.getElementById("btnPomoToggle");
+      if (!isPomoRunning) {
+        isPomoRunning = true;
+        btn.innerText = "Dừng";
+        pomoInterval = setInterval(() => {
+          pomoSeconds--;
+          if (pomoSeconds <= 0) {
+            clearInterval(pomoInterval);
+            alert("Hết phiên Pomodoro 25 phút!");
+            pomoSeconds = 25 * 60;
+            isPomoRunning = false;
+            btn.innerText = "Bắt đầu";
+          }
+          const m = Math.floor(pomoSeconds / 60).toString().padStart(2, '0');
+          const s = (pomoSeconds % 60).toString().padStart(2, '0');
+          document.getElementById("pomoTimer").innerText = `${m}:${s}`;
+        }, 1000);
+      } else {
+        clearInterval(pomoInterval);
+        isPomoRunning = false;
+        btn.innerText = "Tiếp tục";
+      }
+    }
+
+    function copyMeetingLink() {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Đã sao chép link phòng họp!");
+    }
+
+    function leaveCall() {
+      if (confirm("Bạn có chắc chắn muốn rời phòng họp?")) {
+        window.location.reload();
+      }
+    }
+
+    // Tab Switching in Side Panel
+    function setTab(tab) {
+      document.getElementById("panel-kanban").classList.add("hidden");
+      document.getElementById("panel-sos").classList.add("hidden");
+      document.getElementById("panel-git").classList.add("hidden");
+
+      document.getElementById("tabBtn-kanban").className = "flex-1 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5";
+      document.getElementById("tabBtn-sos").className = "flex-1 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5";
+      document.getElementById("tabBtn-git").className = "flex-1 py-2.5 font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1.5";
+
+      if (tab === "kanban") {
+        document.getElementById("panel-kanban").classList.remove("hidden");
+        document.getElementById("tabBtn-kanban").className = "flex-1 py-2.5 font-medium border-b-2 border-indigo-500 text-indigo-500 flex items-center justify-center gap-1.5";
+      } else if (tab === "sos") {
+        document.getElementById("panel-sos").classList.remove("hidden");
+        document.getElementById("tabBtn-sos").className = "flex-1 py-2.5 font-medium border-b-2 border-rose-500 text-rose-500 flex items-center justify-center gap-1.5";
+      } else if (tab === "git") {
+        document.getElementById("panel-git").classList.remove("hidden");
+        document.getElementById("tabBtn-git").className = "flex-1 py-2.5 font-medium border-b-2 border-emerald-500 text-emerald-500 flex items-center justify-center gap-1.5";
+      }
+    }
+
+    // Call Gemini API with Auto-Fallback to gemini-3.1-flash-lite
+    async function callGemini(prompt, isJson = false) {
+      const key = getApiKey();
+      if (!key) {
+        openConfigModal();
+        throw new Error("Chưa có API Key. Hãy nhập key trong phần cài đặt!");
+      }
+
+      let model = document.getElementById("modalModelSelect").value || "gemini-3.1-flash-lite";
+
+      const tryCall = async (targetModel) => {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${key}`;
+        const payload = { contents: [{ parts: [{ text: prompt }] }] };
+        if (isJson) {
+          payload.generationConfig = { response_mime_type: "application/json" };
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err?.error?.message || `Lỗi HTTP ${res.status}`);
+          }
+
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!text) throw new Error("Không có phản hồi");
+          return text;
+        } catch (e) {
+          clearTimeout(timeoutId);
+          throw e;
+        }
+      };
+
+      try {
+        return await tryCall(model);
+      } catch (err) {
+        if ((err.message.includes("high demand") || err.message.includes("503") || err.message.includes("not found")) && model !== "gemini-3.1-flash-lite") {
+          document.getElementById("modalModelSelect").value = "gemini-3.1-flash-lite";
+          return await tryCall("gemini-3.1-flash-lite");
+        }
+        throw err;
+      }
+    }
+
+    // SAMPLES
+    function loadSampleSyllabus() {
+      document.getElementById("taskInputText").value = 
+`ĐỀ TÀI: Xây dựng ứng dụng quản lý phòng tập Gym thông minh (Smart Gym App).
+Yêu cầu:
+1. Thiết kế CSDL học viên, gói tập, lịch tập.
+2. Xây dựng API xác thực JWT (Login, Register).
+3. Làm giao diện ReactJS xem lịch tập và đặt lịch trực tuyến.
+4. Tích hợp cổng thanh toán VNPay / MoMo.
+5. Viết tài liệu kiểm thử và triển khai AWS.`;
+    }
+
+    function loadSampleError() {
+      document.getElementById("errorInputText").value = 
+`TypeError: Cannot read properties of undefined (reading 'split')
+    at authMiddleware (D:\\TeamUp\\server\\middleware\\auth.js:14:38)
+Code:
+const token = req.headers['authorization'].split(' ')[1];`;
+    }
+
+    function loadSampleCommit() {
+      document.getElementById("gitInputText").value = 
+`commit 8f3a1d9b
+Author: minh_dev <minh@teamup.io>
+diff --git a/config/db.js b/config/db.js
++ const DB_URI = "mongodb+srv://admin:SuperSecretPass123@cluster0.abc.mongodb.net/gym_db";
++ const STRIPE_KEY = "sk_live_51M0abcdef1234567890XYZ";`;
+    }
+
+    // 1. Task Decompose Action
+    async function runAutoDecompose() {
+      const text = document.getElementById("taskInputText").value.trim();
+      if (!text) return alert("Vui lòng nhập nội dung đề bài!");
+      const btn = document.getElementById("btnDecompose");
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang bóc tách...';
+      btn.disabled = true;
+
+      const prompt = `Phân tích đề bài sau và chia thành danh sách nhiệm vụ JSON:
+[
+  {"title": "Tên việc ngắn gọn", "description": "Mô tả", "assignee": "Đức", "story_points": 3, "status": "TODO"}
+]
+Gán cho 1 trong 3 người: "Đức (Backend)", "Minh (Frontend)", "Lan (Tester)".
+Story points thuộc [1, 2, 3, 5].
+
+Đề bài:
+${text}`;
+
+      try {
+        const raw = await callGemini(prompt, true);
+        const clean = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+        const tasks = JSON.parse(clean);
+        renderTasks(tasks);
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    }
+
+    function renderTasks(tasks) {
+      const container = document.getElementById("cardsContainer");
+      container.innerHTML = "";
+      document.getElementById("kanbanCountBadge").innerText = `${tasks.length} thẻ`;
+
+      tasks.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "p-2.5 rounded-xl border space-y-1.5 transition shadow-sm";
+        card.style.backgroundColor = "var(--bg-card)";
+        card.style.borderColor = "var(--border-color)";
+        card.innerHTML = `
+          <div class="flex justify-between items-start gap-1">
+            <span class="font-semibold text-xs">${t.title}</span>
+            <span class="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-500 font-mono text-[10px]">${t.story_points} pts</span>
+          </div>
+          <p class="text-[11px]" style="color: var(--text-sub);">${t.description || ""}</p>
+          <div class="flex items-center justify-between pt-1 border-t text-[10px]" style="border-color: var(--border-color);">
+            <span class="text-purple-500 font-medium flex items-center gap-1"><i class="fa-regular fa-user"></i> ${t.assignee}</span>
+            <span class="px-1.5 py-0.5 rounded font-medium border" style="background-color: var(--bg-panel-sub); border-color: var(--border-color); color: var(--text-sub);">${t.status}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 2. SOS Debugger Action
+    async function runSOSDebugger() {
+      const text = document.getElementById("errorInputText").value.trim();
+      if (!text) return alert("Vui lòng nhập log lỗi!");
+      const btn = document.getElementById("btnDebug");
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang soi bug...';
+      btn.disabled = true;
+
+      const prompt = `Bạn là Trợ lý SOS Debugger trong phòng họp. Phân tích lỗi và chỉ ra:
+1. NGUYÊN NHÂN LỖI (1 câu).
+2. DÒNG SAI.
+3. CÁCH FIX (kèm code chuẩn).
+
+Log lỗi:
+${text}`;
+
+      try {
+        const res = await callGemini(prompt, false);
+        document.getElementById("sosSolution").innerText = res;
+        document.getElementById("sosResultBox").classList.remove("hidden");
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    }
+
+    // 3. Git Guard Action
+    async function runGitGuard() {
+      const text = document.getElementById("gitInputText").value.trim();
+      if (!text) return alert("Vui lòng nhập commit!");
+      const btn = document.getElementById("btnGitScan");
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang quét...';
+      btn.disabled = true;
+
+      const prompt = `Kiểm tra commit diff sau bằng JSON:
+{
+  "has_leak": true hoặc false,
+  "leak_details": "Mô tả khóa/password bị lộ nếu có",
+  "genz_summary": "1 câu tóm tắt vui vẻ kiểu Gen Z"
+}
+Diff:
+${text}`;
+
+      try {
+        const raw = await callGemini(prompt, true);
+        const clean = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+        const res = JSON.parse(clean);
+
+        const leakEl = document.getElementById("gitLeakMessage");
+        if (res.has_leak) {
+          leakEl.className = "p-2.5 rounded-lg border border-rose-600 bg-rose-950/80 text-rose-200 text-xs";
+          leakEl.innerHTML = `<b>🚨 CẢNH BÁO BẢO MẬT:</b> ${res.leak_details}`;
+        } else {
+          leakEl.className = "p-2.5 rounded-lg border border-emerald-600 bg-emerald-950/80 text-emerald-200 text-xs";
+          leakEl.innerHTML = `✅ Commit an toàn, không lộ secret.`;
+        }
+
+        document.getElementById("gitGenZSummary").innerText = res.genz_summary || "Đã cập nhật code mới.";
+        document.getElementById("gitAlertBox").classList.remove("hidden");
+      } catch (e) {
+        alert("Lỗi: " + e.message);
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
