@@ -192,38 +192,21 @@
 </head>
 <body class="h-full flex flex-col justify-between">
 
-  <!-- TOP BAR (Google Meet Style with Theme + Palette Switcher + Layout Switcher) -->
-  <header style="background-color: var(--header-bg); border-bottom: 1px solid var(--border-color);" class="h-14 px-4 flex items-center justify-between z-10 select-none transition-colors gap-2">
+  <!-- TOP BAR (Clean Minimalist Google Meet Style) -->
+  <header style="background-color: var(--header-bg); border-bottom: 1px solid var(--border-color);" class="h-14 px-5 flex items-center justify-between z-10 select-none transition-colors">
     <div class="flex items-center gap-3">
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium" id="meetingClock">23:45</span>
         <span class="text-slate-400">|</span>
-        <span class="text-sm font-semibold hidden sm:inline">teamup-dev-warroom</span>
+        <span class="text-sm font-semibold">teamup-dev-warroom</span>
         <span class="px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-600/50 text-emerald-400 text-[11px] flex items-center gap-1.5 font-medium">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Trực tiếp
         </span>
       </div>
-
-      <!-- LAYOUT SELECTOR SEGMENTED CONTROL -->
-      <div class="flex items-center rounded-xl p-0.5 border ml-2" style="background-color: var(--bg-card); border-color: var(--border-color);">
-        <span class="text-[10px] font-medium px-2 hidden md:inline" style="color: var(--text-sub);">Bố cục:</span>
-        <button onclick="changeLayout('meet')" id="btnLayoutMeet" class="px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition" title="Mẫu 1: Google Meet Stage">
-          <i class="fa-solid fa-users-viewfinder"></i> <span class="hidden xl:inline text-[11px]">1. Meet</span>
-        </button>
-        <button onclick="changeLayout('bento')" id="btnLayoutBento" class="px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition text-slate-400 hover:text-slate-200" title="Mẫu 2: Bento Grid Workspace">
-          <i class="fa-solid fa-table-cells-large"></i> <span class="hidden xl:inline text-[11px]">2. Bento</span>
-        </button>
-        <button onclick="changeLayout('ide')" id="btnLayoutIde" class="px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition text-slate-400 hover:text-slate-200" title="Mẫu 3: Focus IDE Terminal">
-          <i class="fa-solid fa-code"></i> <span class="hidden xl:inline text-[11px]">3. Dev IDE</span>
-        </button>
-        <button onclick="changeLayout('lecture')" id="btnLayoutLecture" class="px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition text-slate-400 hover:text-slate-200" title="Mẫu 4: Giảng đường Thuyết trình">
-          <i class="fa-solid fa-chalkboard-user"></i> <span class="hidden xl:inline text-[11px]">4. Giảng đường</span>
-        </button>
-      </div>
     </div>
 
     <!-- Center: Pomodoro Focus Widget -->
-    <div class="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border shadow-sm" style="background-color: var(--bg-card); border-color: var(--border-color);">
+    <div class="flex items-center gap-2 px-3 py-1 rounded-full border shadow-sm" style="background-color: var(--bg-card); border-color: var(--border-color);">
       <i class="fa-solid fa-stopwatch text-primary-var text-xs"></i>
       <span id="pomoTimer" class="font-mono text-xs font-bold tracking-wider">25:00</span>
       <button onclick="togglePomodoro()" id="btnPomoToggle" class="text-[11px] text-primary-var hover:opacity-80 px-2 py-0.5 rounded font-medium transition">
@@ -231,38 +214,18 @@
       </button>
     </div>
 
-    <!-- Right: Color Palette Picker + Theme Switcher + Modal Trigger -->
-    <div class="flex items-center gap-2">
-      
-      <!-- Open Color & Layout Design Picker Modal -->
-      <button onclick="openDesignModal()" class="px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition btn-primary shadow-sm" title="Mở bảng so sánh 4 Tông Màu & 4 Mẫu Giao Diện">
-        <i class="fa-solid fa-palette"></i>
-        <span class="hidden sm:inline text-[11px]">Chọn Màu & Bố Cục</span>
-      </button>
-
-      <!-- PALETTE COLOR QUICK DOTS -->
-      <div class="flex items-center gap-1.5 px-2 py-1 rounded-xl border" style="background-color: var(--bg-card); border-color: var(--border-color);" title="Chọn Tông Màu Nhanh">
-        <button onclick="changePalette('indigo')" id="dot-indigo" class="w-4 h-4 rounded-full bg-indigo-500 hover:scale-125 transition ring-2 ring-offset-1 ring-indigo-400 shadow" title="Tông 1: Deep Indigo & Purple"></button>
-        <button onclick="changePalette('emerald')" id="dot-emerald" class="w-4 h-4 rounded-full bg-emerald-500 hover:scale-125 transition ring-0 shadow" title="Tông 2: Cyber Emerald & Mint"></button>
-        <button onclick="changePalette('blue')" id="dot-blue" class="w-4 h-4 rounded-full bg-blue-600 hover:scale-125 transition ring-0 shadow" title="Tông 3: Modern Tech Blue"></button>
-        <button onclick="changePalette('orange')" id="dot-orange" class="w-4 h-4 rounded-full bg-orange-500 hover:scale-125 transition ring-0 shadow" title="Tông 4: Sunset Amber"></button>
+    <!-- Right: Active Status & Settings Button -->
+    <div class="flex items-center gap-2.5">
+      <!-- Active Theme & Layout Info Pill -->
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-xl border text-xs" style="background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-sub);">
+        <span class="w-2 h-2 rounded-full" id="headerPaletteDot" style="background-color: var(--primary);"></span>
+        <span id="headerLayoutPill" class="font-medium">Mẫu 1 (Meet)</span>
       </div>
 
-      <!-- THEME SELECTOR (Sáng / Tối / Theo hệ thống) -->
-      <div class="flex items-center rounded-xl p-0.5 border" style="background-color: var(--bg-card); border-color: var(--border-color);">
-        <button onclick="changeTheme('light')" id="btnThemeLight" class="px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition" title="Giao diện Sáng (Trắng)">
-          <i class="fa-solid fa-sun text-amber-500"></i> <span class="hidden xl:inline text-[11px]">Sáng</span>
-        </button>
-        <button onclick="changeTheme('dark')" id="btnThemeDark" class="px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition" title="Giao diện Tối (Đen)">
-          <i class="fa-solid fa-moon text-indigo-400"></i> <span class="hidden xl:inline text-[11px]">Tối</span>
-        </button>
-        <button onclick="changeTheme('system')" id="btnThemeSystem" class="px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition" title="Theo hệ thống (Auto)">
-          <i class="fa-solid fa-desktop text-slate-400"></i> <span class="hidden xl:inline text-[11px]">Hệ thống</span>
-        </button>
-      </div>
-
-      <button onclick="openConfigModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition border" style="background-color: var(--bg-card); border-color: var(--border-color);" title="Cài đặt API Key">
+      <!-- Settings Gear Button -->
+      <button onclick="openSettingsModal()" class="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition btn-primary shadow-sm hover:opacity-90" title="Cài đặt phòng họp, giao diện & API">
         <i class="fa-solid fa-gear"></i>
+        <span>Cài đặt</span>
       </button>
     </div>
   </header>
@@ -577,252 +540,356 @@
 
   </footer>
 
-  <!-- DESIGN SELECTOR MODAL (Bảng Chọn Tông Màu & Bố Cục Giao Diện) -->
-  <div id="designModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-    <div class="w-full max-w-4xl max-h-[90vh] rounded-3xl p-6 shadow-2xl flex flex-col border overflow-hidden" style="background-color: var(--bg-panel); border-color: var(--border-color);">
+  <!-- UNIFIED SETTINGS MODAL (Cài Đặt Phòng Họp, Giao Diện, AI & Thiết Bị) -->
+  <div id="settingsModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="w-full max-w-4xl max-h-[92vh] rounded-3xl p-6 shadow-2xl flex flex-col border overflow-hidden" style="background-color: var(--bg-panel); border-color: var(--border-color);">
       
       <!-- Modal Header -->
       <div class="flex justify-between items-center pb-4 border-b" style="border-color: var(--border-color);">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl btn-primary flex items-center justify-center text-white text-base shadow">
-            <i class="fa-solid fa-palette"></i>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl btn-primary flex items-center justify-center text-white text-lg shadow">
+            <i class="fa-solid fa-gear"></i>
           </div>
           <div>
-            <h3 class="text-base font-bold">Thiết Kế Giao Diện & Tông Màu Chủ Đạo</h3>
-            <p class="text-xs" style="color: var(--text-sub);">Tùy biến bộ nhận diện thương hiệu và kiến trúc không gian phòng họp TeamUp AI</p>
+            <h3 class="text-base font-bold">Cài Đặt Phòng Họp & Hệ Thống</h3>
+            <p class="text-xs" style="color: var(--text-sub);">Tùy biến giao diện, bố cục không gian, kết nối AI và thiết bị ngoại vi</p>
           </div>
         </div>
-        <button onclick="closeDesignModal()" class="w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-slate-500/20" style="color: var(--text-sub);">
-          <i class="fa-solid fa-xmark text-base"></i>
+        <button onclick="closeSettingsModal()" class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-slate-500/20" style="color: var(--text-sub);">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Settings Navigation Tabs -->
+      <div class="flex border-b text-xs font-semibold pt-2" style="background-color: var(--bg-panel-sub); border-color: var(--border-color);">
+        <button onclick="setSettingsTab('appearance')" id="settingsTabBtn-appearance" class="px-5 py-3 border-b-2 border-primary-var text-primary-var flex items-center gap-2 transition">
+          <i class="fa-solid fa-palette"></i> Giao Diện & Bố Cục
+        </button>
+        <button onclick="setSettingsTab('ai')" id="settingsTabBtn-ai" class="px-5 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+          <i class="fa-solid fa-brain"></i> Trí Tuệ Nhân Tạo & API
+        </button>
+        <button onclick="setSettingsTab('devices')" id="settingsTabBtn-devices" class="px-5 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+          <i class="fa-solid fa-sliders"></i> Thiết Bị & Âm Thanh
         </button>
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="flex-1 overflow-y-auto py-5 space-y-7 pr-1">
+      <div class="flex-1 overflow-y-auto py-5 pr-1">
 
-        <!-- SECTION 1: PRIMARY COLOR PALETTES -->
-        <div>
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <h4 class="text-xs font-bold uppercase tracking-wider text-primary-var flex items-center gap-1.5">
-                <i class="fa-solid fa-droplet"></i> 1. Chọn Tông Màu Chủ Đạo (Primary Color Tone)
-              </h4>
-              <p class="text-[11px]" style="color: var(--text-sub);">Màu chủ đạo sẽ tự động đồng bộ sang tất cả nút bấm, gradient, thẻ card và viền sáng trên cả 3 chế độ (Sáng / Tối / Hệ thống).</p>
+        <!-- TAB 1: GIAO DIỆN & BỐ CỤC -->
+        <div id="settingsContent-appearance" class="space-y-6">
+
+          <!-- 1.1 Chế Độ Hiển Thị (Light / Dark / System) -->
+          <div class="p-4 rounded-2xl border" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="flex justify-between items-center mb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary-var flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-half-stroke"></i> Chế Độ Màu Giao Diện (Theme Mode)
+                </h4>
+                <p class="text-[11px]" style="color: var(--text-sub);">Lựa chọn nền Sáng (trắng), Tối (đen) hoặc tự động theo hệ điều hành máy tính.</p>
+              </div>
             </div>
-            <span class="text-[11px] font-mono px-2 py-0.5 rounded border bg-primary-light text-primary-var" id="modalCurrentPaletteText">Đang dùng: Indigo</span>
+            <div class="grid grid-cols-3 gap-3">
+              <button onclick="changeTheme('light')" id="modalThemeBtn-light" class="p-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-semibold transition hover:scale-[1.02]" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                <i class="fa-solid fa-sun text-amber-500"></i> Giao Diện Sáng
+              </button>
+              <button onclick="changeTheme('dark')" id="modalThemeBtn-dark" class="p-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-semibold transition hover:scale-[1.02]" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                <i class="fa-solid fa-moon text-indigo-400"></i> Giao Diện Tối
+              </button>
+              <button onclick="changeTheme('system')" id="modalThemeBtn-system" class="p-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-semibold transition hover:scale-[1.02]" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                <i class="fa-solid fa-desktop text-slate-400"></i> Theo Hệ Thống
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
-
-            <!-- PALETTE 1: INDIGO & PURPLE -->
-            <div onclick="selectPaletteFromModal('indigo')" id="paletteCard-indigo" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="h-16 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
-                <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-300"></i> Deep Indigo</span>
+          <!-- 1.2 Tông Màu Chủ Đạo (Primary Color Palette) -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary-var flex items-center gap-1.5">
+                  <i class="fa-solid fa-droplet"></i> Tông Màu Chủ Đạo (Primary Color Tone)
+                </h4>
+                <p class="text-[11px]" style="color: var(--text-sub);">Đồng bộ màu sắc nút bấm, thanh dock, viền Copilot và thẻ card.</p>
               </div>
-              <div class="space-y-1">
-                <div class="flex justify-between items-center">
-                  <span class="font-semibold text-xs">Tím Công Nghệ</span>
-                  <span class="font-mono text-[10px] text-indigo-400">#6366F1</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded border bg-primary-light text-primary-var" id="modalCurrentPaletteText">Đang dùng: Indigo</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <!-- PALETTE 1: INDIGO & PURPLE -->
+              <div onclick="selectPaletteFromModal('indigo')" id="paletteCard-indigo" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="h-16 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
+                  <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-300"></i> Deep Indigo</span>
                 </div>
-                <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Phong cách Gen Z, Linear, Discord. Hiện đại, kích thích tư duy giải thuật.</p>
-                <div class="pt-2 flex items-center justify-between">
-                  <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-medium">Khuyên dùng</span>
-                  <button class="text-[11px] font-semibold text-indigo-400 group-hover:underline">Áp dụng</button>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-semibold text-xs">Tím Công Nghệ</span>
+                    <span class="font-mono text-[10px] text-indigo-400">#6366F1</span>
+                  </div>
+                  <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Gen Z Tech, Linear, Discord. Dịu mắt, kích thích tư duy.</p>
+                  <div class="pt-2 flex items-center justify-between">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-medium">Khuyên dùng</span>
+                    <button class="text-[11px] font-semibold text-indigo-400 group-hover:underline">Áp dụng</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PALETTE 2: CYBER EMERALD -->
+              <div onclick="selectPaletteFromModal('emerald')" id="paletteCard-emerald" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="h-16 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
+                  <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-code-branch text-emerald-200"></i> Cyber Emerald</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-semibold text-xs">Xanh Lục Bảo</span>
+                    <span class="font-mono text-[10px] text-emerald-400">#10B981</span>
+                  </div>
+                  <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Supabase, Git, Spotify. Tươi mới, biểu tượng tiến bộ.</p>
+                  <div class="pt-2 flex items-center justify-between">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">Developer</span>
+                    <button class="text-[11px] font-semibold text-emerald-400 group-hover:underline">Áp dụng</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PALETTE 3: TECH BLUE -->
+              <div onclick="selectPaletteFromModal('blue')" id="paletteCard-blue" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="h-16 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-sky-400 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
+                  <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-sky-200"></i> Modern Blue</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-semibold text-xs">Xanh Chuẩn Meet</span>
+                    <span class="font-mono text-[10px] text-blue-400">#2563EB</span>
+                  </div>
+                  <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Google Meet, Vercel. Trang trọng, học thuật uy tín.</p>
+                  <div class="pt-2 flex items-center justify-between">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">Học thuật</span>
+                    <button class="text-[11px] font-semibold text-blue-400 group-hover:underline">Áp dụng</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PALETTE 4: SUNSET AMBER -->
+              <div onclick="selectPaletteFromModal('orange')" id="paletteCard-orange" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="h-16 rounded-xl bg-gradient-to-tr from-orange-600 via-amber-500 to-yellow-400 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
+                  <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-fire text-amber-200"></i> Sunset Amber</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="font-semibold text-xs">Cam Năng Lượng</span>
+                    <span class="font-mono text-[10px] text-amber-400">#F97316</span>
+                  </div>
+                  <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Notion, Pomodoro, Hackathon. Bùng nổ nhiệt huyết.</p>
+                  <div class="pt-2 flex items-center justify-between">
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium">Nhiệt huyết</span>
+                    <button class="text-[11px] font-semibold text-amber-400 group-hover:underline">Áp dụng</button>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- PALETTE 2: CYBER EMERALD -->
-            <div onclick="selectPaletteFromModal('emerald')" id="paletteCard-emerald" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="h-16 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
-                <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-code-branch text-emerald-200"></i> Cyber Emerald</span>
+          <!-- 1.3 Mẫu Bố Cục Phòng Họp (Layout Templates) -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary-var flex items-center gap-1.5">
+                  <i class="fa-solid fa-layer-group"></i> Mẫu Bố Cục Phòng Họp (Layout Templates)
+                </h4>
+                <p class="text-[11px]" style="color: var(--text-sub);">Tùy chỉnh phân bổ không gian màn hình theo mục đích buổi làm việc nhóm.</p>
               </div>
-              <div class="space-y-1">
-                <div class="flex justify-between items-center">
-                  <span class="font-semibold text-xs">Xanh Lục Bảo</span>
-                  <span class="font-mono text-[10px] text-emerald-400">#10B981</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded border bg-primary-light text-primary-var" id="modalCurrentLayoutText">Đang dùng: Mẫu 1 (Meet)</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- LAYOUT 1: GOOGLE MEET STUDIO -->
+              <div onclick="selectLayoutFromModal('meet')" id="layoutCard-meet" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="flex justify-between items-start">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold">Mẫu 1: Google Meet Stage (Tiêu Chuẩn)</h5>
+                      <span class="text-[10px]" style="color: var(--text-sub);">Lưới camera 2x2 lớn + Thanh Dock nổi + Sidebar AI trượt</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Mặc định</span>
                 </div>
-                <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Phong cách Supabase, OpenAI, Git. Tươi mới, không mỏi mắt khi học đêm.</p>
-                <div class="pt-2 flex items-center justify-between">
-                  <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">Developer</span>
-                  <button class="text-[11px] font-semibold text-emerald-400 group-hover:underline">Áp dụng</button>
+                <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
+                  Thảo luận mặt đối mặt. Khi cần chia việc hoặc sửa lỗi, bấm mở Bảng Điều Phối AI ở cạnh phải.
+                </p>
+                <div class="h-20 rounded-xl border flex p-1.5 gap-1.5" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                  <div class="flex-1 grid grid-cols-2 gap-1">
+                    <div class="rounded bg-slate-700/50 flex items-center justify-center text-[10px] text-slate-400">Bạn</div>
+                    <div class="rounded bg-slate-700/50 flex items-center justify-center text-[10px] text-slate-400">Đức</div>
+                    <div class="rounded bg-slate-700/50 flex items-center justify-center text-[10px] text-slate-400">Minh</div>
+                    <div class="rounded bg-primary-light text-primary-var flex items-center justify-center text-[10px]">Copilot</div>
+                  </div>
+                  <div class="w-20 rounded bg-slate-800/80 border border-slate-700 flex flex-col justify-center items-center text-[9px] text-slate-300">
+                    <i class="fa-solid fa-table-columns text-primary-var mb-0.5"></i> AI Sidebar
+                  </div>
+                </div>
+              </div>
+
+              <!-- LAYOUT 2: BENTO GRID WORKSPACE -->
+              <div onclick="selectLayoutFromModal('bento')" id="layoutCard-bento" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="flex justify-between items-start">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-table-cells-large"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold">Mẫu 2: Bento Grid Workspace (Đa Nhiệm)</h5>
+                      <span class="text-[10px]" style="color: var(--text-sub);">Phong cách Apple / Linear / Raycast</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">Cực hot</span>
+                </div>
+                <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
+                  Không cần đóng/mở thanh bên. Video 4 thành viên, Bảng Kanban trực diện và Radar soi bug SOS cùng hiển thị.
+                </p>
+                <div class="h-20 rounded-xl border grid grid-cols-3 p-1.5 gap-1.5" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                  <div class="rounded bg-slate-700/50 flex flex-col items-center justify-center text-[9px] text-slate-300">
+                    <i class="fa-solid fa-video mb-0.5"></i> 4 Cams
+                  </div>
+                  <div class="rounded bg-primary-light text-primary-var border border-primary-var/30 flex flex-col items-center justify-center text-[9px]">
+                    <i class="fa-solid fa-list-check mb-0.5"></i> Kanban
+                  </div>
+                  <div class="rounded bg-rose-500/10 text-rose-400 border border-rose-500/30 flex flex-col items-center justify-center text-[9px]">
+                    <i class="fa-solid fa-bug mb-0.5"></i> SOS Bug
+                  </div>
+                </div>
+              </div>
+
+              <!-- LAYOUT 3: DEV FOCUS TERMINAL -->
+              <div onclick="selectLayoutFromModal('ide')" id="layoutCard-ide" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="flex justify-between items-start">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold">Mẫu 3: Developer Focus IDE (Lập Trình Viên)</h5>
+                      <span class="text-[10px]" style="color: var(--text-sub);">Phong cách VS Code / Cursor IDE</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">Dev-first</span>
+                </div>
+                <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
+                  Camera thu nhỏ thành dải mỏng trên cùng. 85% diện tích dành cho Code Editor và log cứu bug khẩn cấp.
+                </p>
+                <div class="h-20 rounded-xl border flex flex-col p-1.5 gap-1" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                  <div class="h-5 rounded bg-slate-700/60 flex items-center justify-around px-2 text-[8px] text-slate-300">
+                    <span>● SL</span><span>● ĐN</span><span>● MH</span><span>● AI</span>
+                  </div>
+                  <div class="flex-1 rounded bg-black/40 border border-slate-700/60 p-1 font-mono text-[8px] text-emerald-400 flex items-center">
+                    &gt; Live Code Editor + SOS Debugger Screen
+                  </div>
+                </div>
+              </div>
+
+              <!-- LAYOUT 4: LECTURE & PRESENTATION -->
+              <div onclick="selectLayoutFromModal('lecture')" id="layoutCard-lecture" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="flex justify-between items-start">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
+                      <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold">Mẫu 4: Giảng Đường & Thuyết Trình (Lecture)</h5>
+                      <span class="text-[10px]" style="color: var(--text-sub);">Chia sẻ bài giảng 70% + Cột Camera dọc 30%</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">Thuyết trình</span>
+                </div>
+                <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
+                  Dành cho báo cáo đồ án, xem slide bài tập lớn của giảng viên hoặc review sơ đồ kiến trúc hệ thống.
+                </p>
+                <div class="h-20 rounded-xl border flex p-1.5 gap-1.5" style="background-color: var(--bg-input); border-color: var(--border-color);">
+                  <div class="flex-1 rounded bg-slate-800 border border-slate-700 flex items-center justify-center text-[9px] text-primary-var font-semibold">
+                    <i class="fa-solid fa-chalkboard mr-1"></i> Slide Báo Cáo
+                  </div>
+                  <div class="w-14 flex flex-col gap-1">
+                    <div class="flex-1 rounded bg-slate-700/50"></div>
+                    <div class="flex-1 rounded bg-slate-700/50"></div>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- PALETTE 3: TECH BLUE -->
-            <div onclick="selectPaletteFromModal('blue')" id="paletteCard-blue" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="h-16 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-sky-400 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
-                <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-sky-200"></i> Modern Blue</span>
+        </div>
+
+        <!-- TAB 2: TRÍ TUỆ NHÂN TẠO & API -->
+        <div id="settingsContent-ai" class="space-y-5 hidden">
+          <div class="p-4 rounded-2xl border space-y-4" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-key text-primary-var"></i>
+              <h4 class="text-xs font-bold uppercase tracking-wider">Cấu Hình Google Gemini API Key</h4>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1.5" style="color: var(--text-sub);">Gemini API Key (Google AI Studio):</label>
+              <div class="relative">
+                <input type="password" id="modalApiKeyInput" placeholder="AQ.Ab8RN6Kx..." class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none pr-10" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
+                <button type="button" onclick="toggleApiKeyVisibility()" class="absolute right-3 top-2.5 text-xs hover:text-white" style="color: var(--text-sub);">
+                  <i id="apiKeyEyeIcon" class="fa-solid fa-eye"></i>
+                </button>
               </div>
-              <div class="space-y-1">
-                <div class="flex justify-between items-center">
-                  <span class="font-semibold text-xs">Xanh Chuẩn Meet</span>
-                  <span class="font-mono text-[10px] text-blue-400">#2563EB</span>
-                </div>
-                <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Phong cách Google Workspace, Vercel. Uy tín, học thuật trang trọng.</p>
-                <div class="pt-2 flex items-center justify-between">
-                  <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">Học thuật</span>
-                  <button class="text-[11px] font-semibold text-blue-400 group-hover:underline">Áp dụng</button>
-                </div>
-              </div>
+              <p class="text-[10px] mt-1 text-slate-400">Khóa được mã hóa và lưu an toàn tại bộ nhớ cục bộ (Local Storage) trên máy tính của bạn.</p>
             </div>
 
-            <!-- PALETTE 4: SUNSET AMBER -->
-            <div onclick="selectPaletteFromModal('orange')" id="paletteCard-orange" class="p-3.5 rounded-2xl border cursor-pointer transition-all hover:scale-[1.02] shadow-sm relative group" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="h-16 rounded-xl bg-gradient-to-tr from-orange-600 via-amber-500 to-yellow-400 flex items-center justify-center text-white font-bold text-sm shadow mb-3 relative overflow-hidden">
-                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition"></div>
-                <span class="z-10 flex items-center gap-1.5"><i class="fa-solid fa-fire text-amber-200"></i> Sunset Amber</span>
-              </div>
-              <div class="space-y-1">
-                <div class="flex justify-between items-center">
-                  <span class="font-semibold text-xs">Cam Năng Lượng</span>
-                  <span class="font-mono text-[10px] text-amber-400">#F97316</span>
-                </div>
-                <p class="text-[11px] leading-snug" style="color: var(--text-sub);">Phong cách Canva, Notion, Hackathon. Tinh thần Pomodoro tập trung bứt phá.</p>
-                <div class="pt-2 flex items-center justify-between">
-                  <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-medium">Năng động</span>
-                  <button class="text-[11px] font-semibold text-amber-400 group-hover:underline">Áp dụng</button>
-                </div>
-              </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1.5" style="color: var(--text-sub);">Chọn Mô Hình AI (Model):</label>
+              <select id="modalModelSelect" class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
+                <option value="gemini-3.1-flash-lite" selected>gemini-3.1-flash-lite (Khuyên dùng: Siêu nhanh &lt; 1s, ổn định)</option>
+                <option value="gemini-3.8-flash">gemini-3.8-flash (Model mạnh mẽ mới nhất)</option>
+                <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                <option value="gemini-flash-latest">gemini-flash-latest</option>
+              </select>
             </div>
 
+            <div class="pt-2 flex items-center justify-between border-t" style="border-color: var(--border-color);">
+              <div class="flex items-center gap-2 text-xs text-emerald-400">
+                <i class="fa-solid fa-circle-check"></i> Trạng thái: Sẵn sàng kết nối
+              </div>
+              <button onclick="testAiConnectionInModal()" id="btnTestAiModal" class="px-3 py-1.5 rounded-xl border text-xs font-semibold hover:bg-slate-500/20 transition" style="border-color: var(--border-color);">
+                <i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Thử Kết Nối Ngay
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- SECTION 2: LAYOUT TEMPLATES -->
-        <div>
-          <div class="flex items-center justify-between mb-3">
+        <!-- TAB 3: THIẾT BỊ NGOẠI VI & ÂM THANH -->
+        <div id="settingsContent-devices" class="space-y-5 hidden">
+          <div class="p-4 rounded-2xl border space-y-4" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-microphone-lines text-primary-var"></i>
+              <h4 class="text-xs font-bold uppercase tracking-wider">Cấu Hình Microphone & Camera</h4>
+            </div>
+
             <div>
-              <h4 class="text-xs font-bold uppercase tracking-wider text-primary-var flex items-center gap-1.5">
-                <i class="fa-solid fa-layer-group"></i> 2. Chọn Mẫu Giao Diện Phòng Họp (Layout Templates)
-              </h4>
-              <p class="text-[11px]" style="color: var(--text-sub);">Mỗi mẫu bố trí không gian theo mục đích chuyên biệt: Họp thảo luận, Làm đồ án bento, Lập trình chung hoặc Thuyết trình bài giảng.</p>
-            </div>
-            <span class="text-[11px] font-mono px-2 py-0.5 rounded border bg-primary-light text-primary-var" id="modalCurrentLayoutText">Đang dùng: Mẫu 1 (Meet)</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <!-- LAYOUT 1: GOOGLE MEET STUDIO -->
-            <div onclick="selectLayoutFromModal('meet')" id="layoutCard-meet" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
-                    <i class="fa-solid fa-users-viewfinder"></i>
-                  </div>
-                  <div>
-                    <h5 class="text-xs font-bold">Mẫu 1: Google Meet Stage (Tiêu Chuẩn)</h5>
-                    <span class="text-[10px]" style="color: var(--text-sub);">Lưới camera 2x2 lớn + Thanh Dock nổi + Sidebar AI trượt</span>
-                  </div>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Mặc định</span>
-              </div>
-              <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
-                Tối ưu cho việc giao tiếp mặt đối mặt, quan sát nét mặt biểu cảm của đồng đội. Khi cần giao việc hoặc sửa lỗi, nhấn nút mở Bảng Điều Phối AI ở cạnh phải.
-              </p>
-              <div class="h-20 rounded-xl border flex p-1.5 gap-1.5" style="background-color: var(--bg-input); border-color: var(--border-color);">
-                <div class="flex-1 grid grid-cols-2 gap-1">
-                  <div class="rounded bg-slate-700/50 flex items-center justify-center text-[10px] text-slate-400">Bạn</div>
-                  <div class="rounded bg-slate-700/50 flex items-center justify-center text-[10px] text-slate-400">Đức</div>
-                  <div class="rounded bg-slate-700/50 flex items-center justify-center text-[10px] text-slate-400">Minh</div>
-                  <div class="rounded bg-primary-light text-primary-var flex items-center justify-center text-[10px]">Copilot</div>
-                </div>
-                <div class="w-20 rounded bg-slate-800/80 border border-slate-700 flex flex-col justify-center items-center text-[9px] text-slate-300">
-                  <i class="fa-solid fa-table-columns text-primary-var mb-0.5"></i>
-                  AI Sidebar
-                </div>
-              </div>
+              <label class="block text-xs font-semibold mb-1.5" style="color: var(--text-sub);">Thiết Bị Thu Âm (Microphone):</label>
+              <select class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
+                <option>Mặc định hệ thống - Realtek High Definition Audio</option>
+                <option>Headset Microphone (Tai nghe)</option>
+              </select>
             </div>
 
-            <!-- LAYOUT 2: BENTO GRID WORKSPACE -->
-            <div onclick="selectLayoutFromModal('bento')" id="layoutCard-bento" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
-                    <i class="fa-solid fa-table-cells-large"></i>
-                  </div>
-                  <div>
-                    <h5 class="text-xs font-bold">Mẫu 2: Bento Grid Workspace (Đa Nhiệm)</h5>
-                    <span class="text-[10px]" style="color: var(--text-sub);">Phong cách Apple / Linear / Raycast</span>
-                  </div>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">Cực hot</span>
-              </div>
-              <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
-                Không cần đóng/mở thanh bên. Màn hình được chia thành các khối Bento đồng bộ: Video 4 thành viên, Bảng Kanban trực diện và Radar soi bug SOS.
-              </p>
-              <div class="h-20 rounded-xl border grid grid-cols-3 p-1.5 gap-1.5" style="background-color: var(--bg-input); border-color: var(--border-color);">
-                <div class="rounded bg-slate-700/50 flex flex-col items-center justify-center text-[9px] text-slate-300">
-                  <i class="fa-solid fa-video mb-0.5"></i> 4 Cams
-                </div>
-                <div class="rounded bg-primary-light text-primary-var border border-primary-var/30 flex flex-col items-center justify-center text-[9px]">
-                  <i class="fa-solid fa-list-check mb-0.5"></i> Kanban
-                </div>
-                <div class="rounded bg-rose-500/10 text-rose-400 border border-rose-500/30 flex flex-col items-center justify-center text-[9px]">
-                  <i class="fa-solid fa-bug mb-0.5"></i> SOS Bug
-                </div>
-              </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1.5" style="color: var(--text-sub);">Thiết Bị Ghi Hình (Webcam):</label>
+              <select class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
+                <option>Tự động phát hiện (Webcam HD tích hợp / Ảo)</option>
+                <option>OBS Virtual Camera</option>
+              </select>
             </div>
 
-            <!-- LAYOUT 3: DEV FOCUS TERMINAL -->
-            <div onclick="selectLayoutFromModal('ide')" id="layoutCard-ide" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
-                    <i class="fa-solid fa-code"></i>
-                  </div>
-                  <div>
-                    <h5 class="text-xs font-bold">Mẫu 3: Developer Focus IDE (Lập Trình Viên)</h5>
-                    <span class="text-[10px]" style="color: var(--text-sub);">Phong cách VS Code / Cursor IDE</span>
-                  </div>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">Dev-first</span>
-              </div>
-              <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
-                Video thành viên thu gọn thành dải mỏng trên cùng. 85% diện tích màn hình dành cho Trình soạn thảo mã nguồn cộng tác thời gian thực và log cứu bug.
-              </p>
-              <div class="h-20 rounded-xl border flex flex-col p-1.5 gap-1" style="background-color: var(--bg-input); border-color: var(--border-color);">
-                <div class="h-5 rounded bg-slate-700/60 flex items-center justify-around px-2 text-[8px] text-slate-300">
-                  <span>● SL</span><span>● ĐN</span><span>● MH</span><span>● AI</span>
-                </div>
-                <div class="flex-1 rounded bg-black/40 border border-slate-700/60 p-1 font-mono text-[8px] text-emerald-400 flex items-center">
-                  &gt; Live Code Editor + SOS Debugger Screen
-                </div>
+            <div class="pt-2 border-t flex items-center justify-between" style="border-color: var(--border-color);">
+              <div class="flex items-center gap-2">
+                <input type="checkbox" id="checkPomoSound" checked class="rounded accent-indigo-500">
+                <label for="checkPomoSound" class="text-xs">Phát chuông báo khi hoàn thành phiên Pomodoro 25 phút</label>
               </div>
             </div>
-
-            <!-- LAYOUT 4: LECTURE & PRESENTATION -->
-            <div onclick="selectLayoutFromModal('lecture')" id="layoutCard-lecture" class="p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-sm space-y-2.5 relative" style="background-color: var(--bg-card); border-color: var(--border-color);">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-primary-light text-primary-var flex items-center justify-center text-sm">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                  </div>
-                  <div>
-                    <h5 class="text-xs font-bold">Mẫu 4: Giảng Đường & Thuyết Trình (Lecture)</h5>
-                    <span class="text-[10px]" style="color: var(--text-sub);">Chia sẻ bài giảng 70% + Cột Camera dọc 30%</span>
-                  </div>
-                </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">Thuyết trình</span>
-              </div>
-              <p class="text-xs leading-relaxed" style="color: var(--text-sub);">
-                Thích hợp khi nhóm báo cáo đồ án, xem slide bài tập lớn của giảng viên hoặc review sơ đồ kiến trúc hệ thống cùng nhau.
-              </p>
-              <div class="h-20 rounded-xl border flex p-1.5 gap-1.5" style="background-color: var(--bg-input); border-color: var(--border-color);">
-                <div class="flex-1 rounded bg-slate-800 border border-slate-700 flex items-center justify-center text-[9px] text-primary-var font-semibold">
-                  <i class="fa-solid fa-chalkboard mr-1"></i> Slide Báo Cáo
-                </div>
-                <div class="w-14 flex flex-col gap-1">
-                  <div class="flex-1 rounded bg-slate-700/50"></div>
-                  <div class="flex-1 rounded bg-slate-700/50"></div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
 
@@ -830,46 +897,12 @@
 
       <!-- Modal Footer -->
       <div class="pt-4 border-t flex justify-between items-center" style="border-color: var(--border-color);">
-        <span class="text-xs" style="color: var(--text-sub);">Thay đổi được lưu tự động vào trình duyệt.</span>
-        <button onclick="closeDesignModal()" class="px-5 py-2 btn-primary hover:opacity-90 rounded-xl text-xs font-semibold shadow">
+        <span class="text-xs" style="color: var(--text-sub);">Thiết lập được lưu tự động trên thiết bị của bạn.</span>
+        <button onclick="closeSettingsModal()" class="px-6 py-2 btn-primary hover:opacity-90 rounded-xl text-xs font-semibold shadow">
           Hoàn Tất & Đóng
         </button>
       </div>
 
-    </div>
-  </div>
-
-  <!-- CONFIG MODAL (Gemini API Key) -->
-  <div id="configModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4 border" style="background-color: var(--bg-panel); border-color: var(--border-color);">
-      <div class="flex justify-between items-center">
-        <h3 class="text-sm font-bold flex items-center gap-2">
-          <i class="fa-solid fa-gear text-primary-var"></i> Cài Đặt API Gemini
-        </h3>
-        <button onclick="closeConfigModal()" style="color: var(--text-sub);">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold mb-1">Google Gemini API Key:</label>
-        <input type="password" id="modalApiKeyInput" class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold mb-1">Chọn Model:</label>
-        <select id="modalModelSelect" class="w-full border rounded-xl px-3 py-2 text-xs focus:outline-none" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main);">
-          <option value="gemini-3.1-flash-lite" selected>gemini-3.1-flash-lite (Khuyên dùng: Siêu nhanh)</option>
-          <option value="gemini-3.8-flash">gemini-3.8-flash (Mới nhất)</option>
-          <option value="gemini-3.5-flash">gemini-3.5-flash</option>
-          <option value="gemini-flash-latest">gemini-flash-latest</option>
-        </select>
-      </div>
-
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeConfigModal()" class="px-4 py-2 border rounded-xl text-xs" style="background-color: var(--bg-card); border-color: var(--border-color);">Đóng</button>
-        <button onclick="saveModalKey()" class="px-4 py-2 btn-primary hover:opacity-90 rounded-xl text-xs font-semibold">Lưu lại</button>
-      </div>
     </div>
   </div>
 
@@ -894,19 +927,14 @@
       document.documentElement.classList.remove('palette-indigo', 'palette-emerald', 'palette-blue', 'palette-orange');
       document.documentElement.classList.add('palette-' + paletteName);
 
-      // Update dot active rings in topbar
-      ['indigo', 'emerald', 'blue', 'orange'].forEach(p => {
-        const dot = document.getElementById('dot-' + p);
-        if (dot) {
-          if (p === paletteName) {
-            dot.className = dot.className.replace('ring-0', 'ring-2 ring-offset-1 ring-white');
-          } else {
-            dot.className = dot.className.replace('ring-2 ring-offset-1 ring-white', 'ring-0');
-          }
-        }
-      });
+      // Update header indicator dot
+      const hDot = document.getElementById("headerPaletteDot");
+      if (hDot) {
+        const colors = { indigo: "#6366f1", emerald: "#10b981", blue: "#2563eb", orange: "#f97316" };
+        hDot.style.backgroundColor = colors[paletteName] || "#6366f1";
+      }
 
-      // Update active ring in design modal
+      // Update active ring in settings modal
       ['indigo', 'emerald', 'blue', 'orange'].forEach(p => {
         const card = document.getElementById('paletteCard-' + p);
         if (card) {
@@ -925,16 +953,77 @@
       }
     }
 
-    // DESIGN MODAL & LAYOUT MANAGEMENT
-    function openDesignModal() {
-      document.getElementById("designModal").classList.remove("hidden");
+    // UNIFIED SETTINGS MODAL & LAYOUT MANAGEMENT
+    function openSettingsModal(tab = 'appearance') {
+      const modal = document.getElementById("settingsModal");
+      modal.classList.remove("hidden");
+      modal.style.display = "flex";
+      setSettingsTab(tab);
     }
-    function closeDesignModal() {
-      document.getElementById("designModal").classList.add("hidden");
+
+    function closeSettingsModal() {
+      const modal = document.getElementById("settingsModal");
+      modal.classList.add("hidden");
+      modal.style.display = "none";
+      const key = document.getElementById("modalApiKeyInput").value.trim();
+      if (key) {
+        localStorage.setItem("teamup_gemini_api_key", key);
+      }
     }
+
+    function openDesignModal() { openSettingsModal('appearance'); }
+    function closeDesignModal() { closeSettingsModal(); }
+    function openConfigModal() { openSettingsModal('ai'); }
+    function closeConfigModal() { closeSettingsModal(); }
+
+    function setSettingsTab(tab) {
+      ['appearance', 'ai', 'devices'].forEach(t => {
+        const btn = document.getElementById("settingsTabBtn-" + t);
+        const content = document.getElementById("settingsContent-" + t);
+        if (btn && content) {
+          if (t === tab) {
+            btn.className = "px-5 py-3 border-b-2 border-primary-var text-primary-var flex items-center gap-2 transition";
+            content.classList.remove("hidden");
+          } else {
+            btn.className = "px-5 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition";
+            content.classList.add("hidden");
+          }
+        }
+      });
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById("modalApiKeyInput");
+      const icon = document.getElementById("apiKeyEyeIcon");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.className = "fa-solid fa-eye-slash";
+      } else {
+        input.type = "password";
+        icon.className = "fa-solid fa-eye";
+      }
+    }
+
+    async function testAiConnectionInModal() {
+      const btn = document.getElementById("btnTestAiModal");
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang test...';
+      btn.disabled = true;
+      try {
+        const res = await callGemini("Chào bạn, trả lời ngắn gọn: Sẵn sàng!");
+        alert("Kết nối AI thành công! Phản hồi từ Gemini: " + res);
+      } catch (e) {
+        alert("Lỗi kết nối AI: " + e.message);
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    }
+
     function selectPaletteFromModal(paletteName) {
       changePalette(paletteName);
     }
+
     function selectLayoutFromModal(layoutName) {
       changeLayout(layoutName);
     }
@@ -948,18 +1037,15 @@
       document.body.classList.remove('layout-meet', 'layout-bento', 'layout-ide', 'layout-lecture');
       document.body.classList.add('layout-' + layoutName);
 
-      const btnMeet = document.getElementById("btnLayoutMeet");
-      const btnBento = document.getElementById("btnLayoutBento");
-      const btnIde = document.getElementById("btnLayoutIde");
-      const btnLecture = document.getElementById("btnLayoutLecture");
-
       const ideArea = document.getElementById("ideWorkspaceArea");
       const lectureArea = document.getElementById("lectureScreenShareArea");
 
-      // Reset button styles in header
-      [btnMeet, btnBento, btnIde, btnLecture].forEach(b => {
-        if (b) b.className = "px-2 py-1 rounded-lg text-xs flex items-center gap-1 transition text-slate-400 hover:text-slate-200";
-      });
+      // Update header pill
+      const hPill = document.getElementById("headerLayoutPill");
+      const names = { meet: "Mẫu 1 (Meet)", bento: "Mẫu 2 (Bento)", ide: "Mẫu 3 (Dev IDE)", lecture: "Mẫu 4 (Giảng đường)" };
+      if (hPill) {
+        hPill.innerText = names[layoutName] || layoutName;
+      }
 
       // Reset modal layout card styles
       ['meet', 'bento', 'ide', 'lecture'].forEach(l => {
@@ -976,7 +1062,6 @@
 
       const modalLayoutText = document.getElementById("modalCurrentLayoutText");
       if (modalLayoutText) {
-        const names = { meet: "Mẫu 1 (Meet)", bento: "Mẫu 2 (Bento)", ide: "Mẫu 3 (Dev IDE)", lecture: "Mẫu 4 (Giảng đường)" };
         modalLayoutText.innerText = "Đang dùng: " + (names[layoutName] || layoutName);
       }
 
@@ -984,15 +1069,9 @@
       if (ideArea) ideArea.classList.add("hidden");
       if (lectureArea) lectureArea.classList.add("hidden");
 
-      if (layoutName === 'meet') {
-        if (btnMeet) btnMeet.className = "px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition btn-primary shadow-sm";
-      } else if (layoutName === 'bento') {
-        if (btnBento) btnBento.className = "px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition btn-primary shadow-sm";
-      } else if (layoutName === 'ide') {
-        if (btnIde) btnIde.className = "px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition btn-primary shadow-sm";
+      if (layoutName === 'ide') {
         if (ideArea) ideArea.classList.remove("hidden");
       } else if (layoutName === 'lecture') {
-        if (btnLecture) btnLecture.className = "px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition btn-primary shadow-sm";
         if (lectureArea) lectureArea.classList.remove("hidden");
       }
     }
@@ -1013,22 +1092,17 @@
         document.documentElement.classList.add('theme-light');
       }
 
-      // Update button active styles
-      const btnLight = document.getElementById("btnThemeLight");
-      const btnDark = document.getElementById("btnThemeDark");
-      const btnSys = document.getElementById("btnThemeSystem");
-
-      [btnLight, btnDark, btnSys].forEach(b => {
-        b.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 transition text-slate-400 hover:text-slate-600";
+      // Update modal theme buttons
+      ['light', 'dark', 'system'].forEach(m => {
+        const btn = document.getElementById("modalThemeBtn-" + m);
+        if (btn) {
+          if (m === mode) {
+            btn.classList.add("ring-2", "ring-primary-var", "border-primary-var", "bg-primary-light/10");
+          } else {
+            btn.classList.remove("ring-2", "ring-primary-var", "border-primary-var", "bg-primary-light/10");
+          }
+        }
       });
-
-      if (mode === 'light') {
-        btnLight.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 font-semibold bg-amber-500/10 text-amber-600 shadow-sm";
-      } else if (mode === 'dark') {
-        btnDark.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 font-semibold bg-indigo-500/20 text-indigo-300 shadow-sm";
-      } else {
-        btnSys.className = "px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 font-semibold bg-slate-500/20 text-slate-300 shadow-sm";
-      }
     }
 
     // Listen to OS system color-scheme changes
