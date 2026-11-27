@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roomTitleEl = document.getElementById('roomTitleDisplay');
   if (roomTitleEl) roomTitleEl.innerText = roomId;
 
+  const bottomCodeEl = document.getElementById('bottomMeetingCode');
+  if (bottomCodeEl) bottomCodeEl.innerText = roomId;
+
   // Helper: Initials calculation (e.g. "Đức Nguyễn" -> "ĐN")
   function getInitials(name) {
     if (!name) return 'TU';
@@ -121,9 +124,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         video.srcObject = stream;
 
         const syncStreamState = () => {
-          const videoTracks = stream.getVideoTracks();
-          const hasActiveVideo = videoTracks.length > 0 && videoTracks.some(t => t.enabled && t.readyState === 'live');
-          if (hasActiveVideo) {
+          const peerInfo = peerMetadata.get(peerId);
+          const isCamOn = peerInfo ? !!peerInfo.isCamOn : false;
+          if (isCamOn) {
             video.classList.remove('hidden');
             if (avatar) avatar.classList.add('hidden');
           } else {
@@ -131,12 +134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (avatar) avatar.classList.remove('hidden');
           }
         };
-
-        stream.getVideoTracks().forEach(track => {
-          track.onmute = syncStreamState;
-          track.onunmute = syncStreamState;
-          track.onended = syncStreamState;
-        });
 
         syncStreamState();
       }
@@ -174,6 +171,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Real-Time Peer Camera Toggle Synchronization
   socket.on('peer-cam-state', ({ peerId, isCamOn }) => {
+    const info = peerMetadata.get(peerId);
+    if (info) info.isCamOn = !!isCamOn;
+
     const tile = document.getElementById(`peer-tile-${peerId}`);
     if (tile) {
       const video = tile.querySelector('video');
@@ -498,13 +498,14 @@ diff --git a/config/db.js b/config/db.js
   };
 
   window.copyMeetingLink = function() {
-    navigator.clipboard.writeText(window.location.href);
-    alert('Đã sao chép liên kết phòng họp vào bộ nhớ tạm!');
+    const meetUrl = `${window.location.origin}/room?room=${encodeURIComponent(roomId)}`;
+    navigator.clipboard.writeText(meetUrl);
+    alert('Đã sao chép liên kết phòng họp vào bộ nhớ tạm: ' + meetUrl);
   };
 
   window.leaveCall = function() {
     if (confirm('Bạn có chắc chắn muốn rời phòng họp TeamUp AI?')) {
-      window.location.reload();
+      window.location.href = '/';
     }
   };
 });

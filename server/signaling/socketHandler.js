@@ -26,6 +26,8 @@ module.exports = function setupSignaling(io) {
         id: socket.id,
         name: userName || 'Thành viên mới',
         role: userRole || 'Developer',
+        isCamOn: false,
+        isMicOn: true,
         joinedAt: Date.now()
       };
 
@@ -95,6 +97,10 @@ module.exports = function setupSignaling(io) {
 
     // Camera On/Off State Broadcast
     socket.on('cam-state', ({ roomId, isCamOn }) => {
+      const room = rooms.get(roomId);
+      if (room && room.members.has(socket.id)) {
+        room.members.get(socket.id).isCamOn = !!isCamOn;
+      }
       socket.to(roomId).emit('peer-cam-state', {
         peerId: socket.id,
         isCamOn: !!isCamOn
@@ -103,6 +109,10 @@ module.exports = function setupSignaling(io) {
 
     // Microphone On/Off State Broadcast
     socket.on('mic-state', ({ roomId, isMicOn }) => {
+      const room = rooms.get(roomId);
+      if (room && room.members.has(socket.id)) {
+        room.members.get(socket.id).isMicOn = !!isMicOn;
+      }
       socket.to(roomId).emit('peer-mic-state', {
         peerId: socket.id,
         isMicOn: !!isMicOn

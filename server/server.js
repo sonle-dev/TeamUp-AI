@@ -41,7 +41,12 @@ app.get('/api/health', (req, res) => {
 // Setup WebRTC Multi-Peer Mesh Signaling & Room Management
 setupSignaling(io);
 
-// Catch-all route to serve SPA
+// Explicit Room Endpoint
+app.get('/room', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/room.html'));
+});
+
+// Catch-all route to serve landing page
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
