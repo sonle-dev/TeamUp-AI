@@ -3,18 +3,26 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Parse Room ID & User Info from URL or Authenticated Session
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get('room') || 'teamup-dev-warroom';
-
+  // 0. Enforce Login: Guests are blocked from room entry
+  const rawToken = localStorage.getItem('teamup_token');
   let savedUser = null;
   try {
     const raw = localStorage.getItem('teamup_user');
     if (raw) savedUser = JSON.parse(raw);
   } catch (e) {}
 
-  const userName = urlParams.get('name') || (savedUser ? savedUser.name : 'Sơn Lê');
-  const userRole = urlParams.get('role') || (savedUser ? savedUser.role : 'Team Leader');
+  if (!rawToken || !savedUser || !savedUser.id || savedUser.id === 'usr_guest') {
+    alert('⚠️ Bạn chưa đăng nhập! Vui lòng đăng nhập tài khoản trước khi vào phòng họp.');
+    window.location.href = '/?auth=required';
+    return;
+  }
+
+  // 1. Parse Room ID & User Info from URL or Authenticated Session
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('room') || 'teamup-dev-warroom';
+  const userName = urlParams.get('name') || savedUser.name;
+  const userRole = urlParams.get('role') || savedUser.role;
+  const userAvatar = savedUser.avatar || '';
 
   const roomTitleEl = document.getElementById('roomTitleDisplay');
   if (roomTitleEl) roomTitleEl.innerText = roomId;
@@ -51,8 +59,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Update Local User Tile in UI
-  const localInitialsEl = document.getElementById('localInitials');
-  if (localInitialsEl) localInitialsEl.innerText = getInitials(userName);
+  const localAvatarBadge = document.getElementById('localAvatarBadge');
+  if (localAvatarBadge) {
+    if (userAvatar) {
+      localAvatarBadge.innerHTML = `<img src="${userAvatar}" alt="${userName}" class="w-full h-full object-cover">`;
+    } else {
+      localAvatarBadge.innerHTML = `<span id="localInitials">${getInitials(userName)}</span>`;
+    }
+  }
 
   const localUserTagEl = document.getElementById('localUserTag');
   if (localUserTagEl) localUserTagEl.innerText = `${userName} (Bạn - ${userRole})`;
@@ -92,6 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const info = peerMetadata.get(peerId) || { name: `Thành viên (${peerId.slice(0, 5)})`, role: 'Thành viên' };
       const initials = getInitials(info.name);
       const gradient = getAvatarGradient(peerId);
+      const avatarCircle = info.avatar
+        ? `<div class="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4 overflow-hidden" style="ring-color: var(--border-color);"><img src="${info.avatar}" alt="${info.name}" class="w-full h-full object-cover"></div>`
+        : `<div class="w-24 h-24 rounded-full ${gradient} flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4" style="ring-color: var(--border-color);">${initials}</div>`;
 
       if (!tile) {
         tile = document.createElement('div');
@@ -101,9 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <video autoplay playsinline class="w-full h-full object-cover hidden"></video>
 
           <div class="peer-avatar flex flex-col items-center justify-center gap-3">
-            <div class="w-24 h-24 rounded-full ${gradient} flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4" style="ring-color: var(--border-color);">
-              ${initials}
-            </div>
+            ${avatarCircle}
             <div class="flex items-center gap-1.5 text-xs" style="color: var(--text-sub);">
               <span class="px-2 py-0.5 rounded font-mono text-[10px] border text-primary-var bg-primary-light" style="border-color: var(--primary-border);">${info.role}</span>
             </div>
@@ -209,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Join Room
-  socket.emit('join-room', { roomId, userName, userRole });
+  socket.emit('join-room', { roomId, userName, userRole, userAvatar });
 
   // 6. Header Clock
   setInterval(() => {

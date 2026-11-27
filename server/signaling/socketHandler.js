@@ -10,7 +10,7 @@ module.exports = function setupSignaling(io) {
     console.log(`[Socket] Connected: ${socket.id}`);
 
     // User joins a room
-    socket.on('join-room', ({ roomId, userName, userRole }) => {
+    socket.on('join-room', ({ roomId, userName, userRole, userAvatar }) => {
       socket.join(roomId);
 
       if (!rooms.has(roomId)) {
@@ -26,6 +26,7 @@ module.exports = function setupSignaling(io) {
         id: socket.id,
         name: userName || 'Thành viên mới',
         role: userRole || 'Developer',
+        avatar: userAvatar || '',
         isCamOn: false,
         isMicOn: true,
         joinedAt: Date.now()

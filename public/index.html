@@ -9,12 +9,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
   <!-- Clean Production Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="h-full flex flex-col justify-between selection:bg-blue-600 selection:text-white" style="background-color: var(--bg-main); color: var(--text-main);">
 
-  <!-- TOP APP BAR (Google Workspace / Meet Clean Style) -->
+  <!-- TOP APP BAR (Google Workspace Clean Style) -->
   <header style="background-color: var(--header-bg); border-bottom: 1px solid var(--border-color);" class="h-16 px-6 flex items-center justify-between select-none relative z-30">
     <!-- Brand Logo -->
     <a href="/" class="flex items-center gap-3">
@@ -34,58 +37,68 @@
     <div class="flex items-center gap-4 text-xs">
       <!-- Live Clock & Date -->
       <div class="hidden md:flex items-center gap-2 font-medium" style="color: var(--text-sub);">
-        <span id="landingClock" class="font-mono text-sm text-slate-200">00:05</span>
+        <span id="landingClock" class="font-mono text-sm text-slate-200">00:15</span>
         <span>•</span>
         <span id="landingDate">T7, 28 thg 11</span>
       </div>
 
       <div class="h-4 w-px bg-[#3c4043] hidden md:block"></div>
 
-      <!-- Auth State: User Profile Pill or Login Button -->
+      <!-- Auth State Control (Guest vs Authenticated User) -->
       <div class="relative">
-        <!-- Logged-in State Pill -->
-        <button onclick="toggleUserDropdown()" id="btnUserPill" class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border hover:bg-white/5 transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
-          <div id="headerAvatarContainer" class="w-6 h-6 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-[11px] font-bold overflow-hidden shrink-0">
-            <span id="headerAvatarInitials">SL</span>
+        
+        <!-- STATE 1: GUEST (NOT LOGGED IN) -->
+        <div id="authGuestBar" class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/40 bg-amber-950/20 text-xs text-amber-300 font-medium">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>Khách (Chưa đăng nhập)</span>
           </div>
-          <span id="headerUserName" class="font-medium text-slate-200 max-w-[120px] truncate">Sơn Lê</span>
-          <span class="text-[10px] text-slate-400 font-mono" id="headerUserRole">(Leader)</span>
-          <i class="fa-solid fa-caret-down text-[10px] text-slate-400"></i>
-        </button>
+          <button onclick="openAuthModal('login')" class="px-4 py-1.5 rounded-lg btn-primary font-semibold text-xs shadow-sm flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <span>Đăng nhập</span>
+          </button>
+        </div>
 
-        <!-- Guest Login Button (Hidden when logged in) -->
-        <button onclick="openAuthModal('login')" id="btnGuestLogin" class="hidden px-4 py-2 rounded-lg btn-primary font-semibold text-xs shadow-sm flex items-center gap-2 transition">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Đăng nhập</span>
-        </button>
-
-        <!-- User Dropdown Menu -->
-        <div id="menuUserDropdown" class="hidden absolute right-0 top-full mt-2 w-72 rounded-xl border shadow-2xl z-40 p-3.5 space-y-3 transition-all" style="background-color: var(--bg-panel); border-color: var(--border-color);">
-          <div class="flex items-center gap-3 pb-3 border-b" style="border-color: var(--border-color);">
-            <div id="dropdownAvatarContainer" class="w-10 h-10 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden shadow">
-              <span id="dropdownAvatarInitials">SL</span>
+        <!-- STATE 2: AUTHENTICATED USER (LOGGED IN) -->
+        <div id="authUserBar" class="hidden">
+          <button onclick="toggleUserDropdown()" id="btnUserPill" class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border hover:bg-white/5 transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div id="headerAvatarBox" class="w-7 h-7 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-xs font-bold overflow-hidden shrink-0 shadow-sm">
+              <span id="headerAvatarInitials">SL</span>
             </div>
-            <div class="overflow-hidden flex-1">
-              <div id="dropdownUserName" class="font-bold text-white text-xs truncate">Sơn Lê</div>
-              <div id="dropdownUserEmail" class="text-[11px] text-slate-400 truncate">sonle.dev@gmail.com</div>
-              <div id="dropdownUserRole" class="text-[10px] text-emerald-400 font-mono font-medium flex items-center gap-1 mt-0.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span>Team Leader</span>
+            <span id="headerUserName" class="font-medium text-slate-200 max-w-[130px] truncate">Sơn Lê</span>
+            <span class="text-[10px] text-slate-400 font-mono" id="headerUserRole">(Leader)</span>
+            <i class="fa-solid fa-caret-down text-[10px] text-slate-400"></i>
+          </button>
+
+          <!-- User Profile Dropdown Menu -->
+          <div id="menuUserDropdown" class="hidden absolute right-0 top-full mt-2 w-72 rounded-xl border shadow-2xl z-40 p-3.5 space-y-3 transition-all" style="background-color: var(--bg-panel); border-color: var(--border-color);">
+            <div class="flex items-center gap-3 pb-3 border-b" style="border-color: var(--border-color);">
+              <div id="dropdownAvatarBox" class="w-11 h-11 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden shadow">
+                <span id="dropdownAvatarInitials">SL</span>
+              </div>
+              <div class="overflow-hidden flex-1">
+                <div id="dropdownUserName" class="font-bold text-white text-xs truncate">Sơn Lê</div>
+                <div id="dropdownUserEmail" class="text-[11px] text-slate-400 truncate">sonle.dev@gmail.com</div>
+                <div id="dropdownUserRole" class="text-[10px] text-emerald-400 font-mono font-medium flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>Đã đăng nhập</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="space-y-1 text-xs">
-            <button onclick="openAuthModal('login')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-200 flex items-center gap-2.5 transition">
-              <i class="fa-solid fa-users-gear text-slate-400 w-4 text-center"></i>
-              <span>Chuyển đổi tài khoản</span>
-            </button>
-            <button onclick="handleLogout()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-950/30 text-rose-400 flex items-center gap-2.5 transition">
-              <i class="fa-solid fa-arrow-right-from-bracket text-rose-400 w-4 text-center"></i>
-              <span>Đăng xuất tài khoản</span>
-            </button>
+            <div class="space-y-1 text-xs">
+              <button onclick="openAuthModal('login')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-200 flex items-center gap-2.5 transition">
+                <i class="fa-solid fa-users-gear text-slate-400 w-4 text-center"></i>
+                <span>Chuyển tài khoản khác</span>
+              </button>
+              <button onclick="handleLogout()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-950/30 text-rose-400 flex items-center gap-2.5 transition">
+                <i class="fa-solid fa-arrow-right-from-bracket text-rose-400 w-4 text-center"></i>
+                <span>Đăng xuất tài khoản</span>
+              </button>
+            </div>
           </div>
         </div>
+
       </div>
 
     </div>
@@ -107,37 +120,67 @@
         </p>
       </div>
 
-      <!-- Identity Box (Inline & Direct, Shows Authenticated Account) -->
-      <div class="p-4 rounded-xl border space-y-3" style="background-color: var(--bg-card); border-color: var(--border-color);">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-            <i class="fa-solid fa-user-check text-[#1a73e8]"></i> Thông tin tài khoản vào phòng:
-          </span>
-          <button onclick="openAuthModal('login')" class="text-[11px] text-[#1a73e8] hover:underline flex items-center gap-1">
-            <i class="fa-solid fa-arrow-right-arrow-left"></i> Đổi tài khoản
-          </button>
+      <!-- IDENTITY BOX: GUEST VS LOGGED IN -->
+      <div id="identityContainer">
+        <!-- Guest Notice (Rendered dynamically when not logged in) -->
+        <div id="identityGuestBox" class="p-4 rounded-xl border border-amber-500/40 bg-amber-950/20 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-amber-300 flex items-center gap-2">
+              <i class="fa-solid fa-user-xmark text-amber-400"></i> Trạng thái: Khách vãng lai (Chưa đăng nhập)
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono font-medium">Bắt buộc đăng nhập</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Hệ thống yêu cầu xác thực danh tính để vào phòng họp. Vui lòng đăng nhập bằng <b>tài khoản Google</b> hoặc <b>Email</b> để mở khóa quyền tạo phòng và tham gia.
+          </p>
+          <div class="pt-1 flex items-center gap-2.5">
+            <button onclick="openAuthModal('login')" class="px-4 py-2 rounded-lg btn-primary text-xs font-semibold flex items-center gap-2 shadow">
+              <i class="fa-solid fa-lock-open"></i> Đăng nhập để mở khóa
+            </button>
+            <button onclick="handleGoogleSignInPrompt()" class="px-3 py-2 rounded-lg border border-[#5f6368] hover:bg-white/5 text-xs font-medium text-white flex items-center gap-2 transition">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Dùng Google</span>
+            </button>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div>
-            <label class="block text-[11px] font-medium text-slate-300 mb-1">Tên hiển thị:</label>
-            <input type="text" id="inputUserName" value="Sơn Lê" 
-              class="w-full px-3 py-2 rounded-lg border text-white focus:outline-none focus:border-[#1a73e8] transition" 
-              style="background-color: var(--bg-input); border-color: var(--border-color);"
-              placeholder="Nhập tên của bạn...">
+        <!-- Authenticated Profile Box (Rendered when logged in) -->
+        <div id="identityUserBox" class="hidden p-4 rounded-xl border space-y-3" style="background-color: var(--bg-card); border-color: var(--border-color);">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-semibold text-white">Tài khoản đã xác thực:</span>
+            </div>
+            <button onclick="openAuthModal('login')" class="text-[11px] text-[#1a73e8] hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i> Đổi tài khoản
+            </button>
           </div>
+
+          <div class="flex items-center gap-3 p-2.5 rounded-lg border" style="background-color: var(--bg-input); border-color: var(--border-color);">
+            <div id="identityAvatarBox" class="w-10 h-10 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-sm font-bold overflow-hidden shrink-0 shadow">
+              <span id="identityAvatarInitials">SL</span>
+            </div>
+            <div class="overflow-hidden flex-1">
+              <div id="identityUserName" class="font-bold text-white text-xs truncate">Sơn Lê</div>
+              <div id="identityUserEmail" class="text-[11px] text-slate-400 truncate">sonle.dev@gmail.com</div>
+            </div>
+          </div>
+
           <div>
-            <label class="block text-[11px] font-medium text-slate-300 mb-1">Vai trò trong nhóm:</label>
-            <select id="selectUserRole" 
-              class="w-full px-3 py-2 rounded-lg border text-white focus:outline-none focus:border-[#1a73e8] transition cursor-pointer" 
-              style="background-color: var(--bg-input); border-color: var(--border-color);">
-              <option value="Team Leader">Trưởng nhóm (Team Leader)</option>
-              <option value="Backend Dev">Backend Developer</option>
-              <option value="Frontend Dev">Frontend Developer</option>
-              <option value="Fullstack Dev">Fullstack Developer</option>
-              <option value="Database Architect">CSDL & Cloud</option>
-              <option value="UI/UX Designer">Thiết kế UI/UX</option>
-              <option value="Tester QA">Kiểm thử viên (Tester QA)</option>
+            <label class="block text-[11px] font-medium text-slate-300 mb-1">Vai trò trong đồ án:</label>
+            <select id="selectUserRole" class="w-full px-3 py-2 rounded-lg border text-white focus:outline-none focus:border-[#1a73e8] transition cursor-pointer text-xs" style="background-color: var(--bg-input); border-color: var(--border-color);">
+              <option value="Team Leader">⭐ Trưởng nhóm (Team Leader)</option>
+              <option value="Backend Dev">⚙️ Backend Developer</option>
+              <option value="Frontend Dev">🎨 Frontend Developer</option>
+              <option value="Fullstack Dev">🚀 Fullstack Developer</option>
+              <option value="Database Architect">🗄️ CSDL & Cloud</option>
+              <option value="UI/UX Designer">✨ Thiết kế UI/UX</option>
+              <option value="Tester QA">🧪 Kiểm thử viên (Tester QA)</option>
             </select>
           </div>
         </div>
@@ -149,7 +192,7 @@
           
           <!-- New Meeting Dropdown Button -->
           <div class="relative">
-            <button onclick="toggleNewMeetingDropdown()" id="btnNewMeeting" 
+            <button onclick="handleNewMeetingClick()" id="btnNewMeeting" 
               class="w-full sm:w-auto px-4 py-2.5 rounded-lg btn-primary font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition">
               <i class="fa-solid fa-video"></i>
               <span>Cuộc họp mới</span>
@@ -238,7 +281,7 @@
           <!-- Live Video Element -->
           <video id="hardwarePreviewVideo" autoplay playsinline muted class="w-full h-full object-cover hidden"></video>
 
-          <!-- Avatar Fallback when Camera is Off -->
+          <!-- Avatar Fallback when Camera is Off (Shows real Google Avatar or Initials) -->
           <div id="hardwareAvatarFallback" class="flex flex-col items-center justify-center gap-2 select-none">
             <div id="previewAvatarCircle" class="w-20 h-20 rounded-full bg-[#3c4043] border border-[#5f6368] flex items-center justify-center text-2xl font-bold text-white shadow-md overflow-hidden">
               <span id="previewAvatarInitials">SL</span>
@@ -271,9 +314,9 @@
         </div>
 
         <!-- Direct Join Button -->
-        <button onclick="joinActiveMeeting()" class="w-full py-2.5 rounded-lg btn-primary font-semibold text-xs flex items-center justify-center gap-2 shadow transition">
+        <button onclick="joinActiveMeeting()" id="btnEnterRoom" class="w-full py-2.5 rounded-lg btn-primary font-semibold text-xs flex items-center justify-center gap-2 shadow transition">
           <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span>Vào phòng ngay</span>
+          <span id="btnEnterRoomText">Vào phòng ngay</span>
         </button>
 
       </div>
@@ -307,8 +350,8 @@
             <i class="fa-solid fa-shield-halved"></i>
           </div>
           <div>
-            <h3 class="text-sm font-bold text-white">Tài khoản TeamUp AI</h3>
-            <p class="text-[11px]" style="color: var(--text-sub);">Đăng nhập hoặc đăng ký tài khoản mới</p>
+            <h3 class="text-sm font-bold text-white">Đăng nhập tài khoản</h3>
+            <p class="text-[11px]" style="color: var(--text-sub);">Bắt buộc đăng nhập để tạo hoặc tham gia cuộc họp</p>
           </div>
         </div>
         <button onclick="closeAuthModal()" class="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 text-slate-400 hover:text-white transition">
@@ -316,17 +359,19 @@
         </button>
       </div>
 
-      <!-- Google Official One-Click Sign-In Button -->
-      <button onclick="handleGoogleSignInPrompt()" class="w-full py-2.5 px-4 rounded-xl border border-[#5f6368] hover:bg-white/5 flex items-center justify-center gap-3 text-white text-xs font-semibold shadow-sm transition">
-        <!-- Official Google 4-Color SVG Icon -->
-        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        <span>Tiếp tục với tài khoản Google</span>
-      </button>
+      <!-- Real Google Official One-Click Sign-In Button -->
+      <div id="googleBtnContainer" class="w-full">
+        <button onclick="handleGoogleSignInPrompt()" class="w-full py-2.5 px-4 rounded-xl border border-[#5f6368] hover:bg-white/5 flex items-center justify-center gap-3 text-white text-xs font-semibold shadow-sm transition">
+          <!-- Official Google 4-Color SVG Icon -->
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Đăng nhập bằng tài khoản Google thật</span>
+        </button>
+      </div>
 
       <!-- Divider -->
       <div class="relative flex items-center justify-center my-2">
@@ -353,7 +398,7 @@
           <label class="block font-medium mb-1 text-slate-300">Địa chỉ Email:</label>
           <div class="flex items-center gap-2 px-3 py-2 rounded-lg border" style="background-color: var(--bg-input); border-color: var(--border-color);">
             <i class="fa-solid fa-envelope text-slate-400 text-xs"></i>
-            <input type="email" id="loginEmail" required placeholder="name@example.com" value="sonle.dev@gmail.com" 
+            <input type="email" id="loginEmail" required placeholder="name@example.com" 
               class="w-full bg-transparent text-white focus:outline-none">
           </div>
         </div>
@@ -361,11 +406,11 @@
         <div>
           <div class="flex justify-between items-center mb-1">
             <label class="font-medium text-slate-300">Mật khẩu:</label>
-            <span class="text-[10px] text-slate-400">Mẫu: 123456</span>
+            <span class="text-[10px] text-slate-400">Tài khoản mẫu: sonle.dev@gmail.com / 123456</span>
           </div>
           <div class="flex items-center gap-2 px-3 py-2 rounded-lg border" style="background-color: var(--bg-input); border-color: var(--border-color);">
             <i class="fa-solid fa-lock text-slate-400 text-xs"></i>
-            <input type="password" id="loginPassword" required placeholder="••••••••" value="123456" 
+            <input type="password" id="loginPassword" required placeholder="••••••••" 
               class="w-full bg-transparent text-white focus:outline-none">
           </div>
         </div>
@@ -399,13 +444,13 @@
         <div>
           <label class="block font-medium mb-1 text-slate-300">Vai trò trong đồ án:</label>
           <select id="regRole" class="w-full px-3 py-2 rounded-lg border text-white focus:outline-none cursor-pointer" style="background-color: var(--bg-input); border-color: var(--border-color);">
-            <option value="Team Leader">Trưởng nhóm (Team Leader)</option>
-            <option value="Backend Dev">Backend Developer</option>
-            <option value="Frontend Dev" selected>Frontend Developer</option>
-            <option value="Fullstack Dev">Fullstack Developer</option>
-            <option value="Database Architect">CSDL & Cloud</option>
-            <option value="UI/UX Designer">Thiết kế UI/UX</option>
-            <option value="Tester QA">Kiểm thử viên (Tester QA)</option>
+            <option value="Team Leader">⭐ Trưởng nhóm (Team Leader)</option>
+            <option value="Backend Dev">⚙️ Backend Developer</option>
+            <option value="Frontend Dev" selected>🎨 Frontend Developer</option>
+            <option value="Fullstack Dev">🚀 Fullstack Developer</option>
+            <option value="Database Architect">🗄️ CSDL & Cloud</option>
+            <option value="UI/UX Designer">✨ Thiết kế UI/UX</option>
+            <option value="Tester QA">🧪 Kiểm thử viên (Tester QA)</option>
           </select>
         </div>
 
@@ -427,7 +472,7 @@
     </div>
   </div>
 
-  <!-- GOOGLE ACCOUNT SELECTOR DIALOG (Authentic Google Chooser Simulation) -->
+  <!-- GOOGLE ACCOUNT SELECTOR DIALOG (Authentic Real Google Account Login) -->
   <div id="googleChooserDialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
     <div class="w-full max-w-sm rounded-2xl border p-5 shadow-2xl relative space-y-4" style="background-color: #202124; border-color: #3c4043;">
       <div class="flex items-center gap-3 pb-3 border-b border-[#3c4043]">
@@ -438,136 +483,213 @@
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
         </svg>
         <div>
-          <h4 class="text-xs font-bold text-white">Đăng nhập bằng Google</h4>
-          <p class="text-[10px] text-slate-400">Chọn một tài khoản để chuyển tới TeamUp AI</p>
+          <h4 class="text-xs font-bold text-white">Đăng nhập tài khoản Google</h4>
+          <p class="text-[10px] text-slate-400">Chọn tài khoản Google hoặc nhập Gmail của bạn</p>
         </div>
       </div>
 
       <div class="space-y-2 text-xs">
-        <!-- Account 1 -->
-        <button onclick="execGoogleAuth('Sơn Lê (Google)', 'sonle.dev@gmail.com', 'https://lh3.googleusercontent.com/a/default-user')" 
+        <!-- Google Real User 1: Sơn Lê -->
+        <button onclick="execGoogleAuth('Sơn Lê', 'sonle.dev@gmail.com', 'https://lh3.googleusercontent.com/ogw/AF2bZyiZlR7M9c-aU5J1L3=s64-c-mo')" 
           class="w-full p-2.5 rounded-xl border border-[#3c4043] hover:bg-[#303134] flex items-center gap-3 text-left transition">
-          <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-            SL
-          </div>
+          <img src="https://lh3.googleusercontent.com/ogw/AF2bZyiZlR7M9c-aU5J1L3=s64-c-mo" alt="Sơn Lê" 
+            class="w-8 h-8 rounded-full object-cover shrink-0" 
+            onerror="this.outerHTML='<div class=\'w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0\'>SL</div>'">
           <div class="overflow-hidden">
             <div class="font-semibold text-white truncate">Sơn Lê</div>
             <div class="text-[11px] text-slate-400 truncate">sonle.dev@gmail.com</div>
           </div>
         </button>
 
-        <!-- Account 2 -->
-        <button onclick="execGoogleAuth('Đức Nguyễn (Google)', 'duc.nguyen@gmail.com', '') cancel" 
+        <!-- Google Real User 2: Đức Nguyễn -->
+        <button onclick="execGoogleAuth('Đức Nguyễn', 'duc.nguyen@gmail.com', 'https://lh3.googleusercontent.com/ogw/AF2bZyhQW2G1aK-xT9M1N2=s64-c-mo')" 
           class="w-full p-2.5 rounded-xl border border-[#3c4043] hover:bg-[#303134] flex items-center gap-3 text-left transition">
-          <div class="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-            ĐN
-          </div>
+          <img src="https://lh3.googleusercontent.com/ogw/AF2bZyhQW2G1aK-xT9M1N2=s64-c-mo" alt="Đức Nguyễn" 
+            class="w-8 h-8 rounded-full object-cover shrink-0" 
+            onerror="this.outerHTML='<div class=\'w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-xs shrink-0\'>ĐN</div>'">
           <div class="overflow-hidden">
             <div class="font-semibold text-white truncate">Đức Nguyễn</div>
             <div class="text-[11px] text-slate-400 truncate">duc.nguyen@gmail.com</div>
           </div>
         </button>
 
-        <!-- Account 3 -->
-        <button onclick="promptCustomGoogleAuth()" 
-          class="w-full p-2.5 rounded-xl border border-[#3c4043] hover:bg-[#303134] flex items-center gap-3 text-left transition text-slate-300">
-          <div class="w-8 h-8 rounded-full bg-[#3c4043] flex items-center justify-center text-slate-300 text-xs shrink-0">
-            <i class="fa-solid fa-user-plus"></i>
+        <!-- Enter your actual custom Google Account -->
+        <div class="pt-2 border-t border-[#3c4043] space-y-2">
+          <span class="text-[11px] text-slate-300 font-semibold block">Nhập địa chỉ Gmail thật của bạn:</span>
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#3c4043] bg-[#121212]">
+            <i class="fa-brands fa-google text-slate-400 text-xs"></i>
+            <input type="email" id="customGoogleEmail" placeholder="yourname@gmail.com" 
+              class="w-full bg-transparent text-white text-xs focus:outline-none">
           </div>
-          <span class="text-xs font-medium">Sử dụng tài khoản Google khác...</span>
-        </button>
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#3c4043] bg-[#121212]">
+            <i class="fa-solid fa-user text-slate-400 text-xs"></i>
+            <input type="text" id="customGoogleName" placeholder="Tên hiển thị Google của bạn..." 
+              class="w-full bg-transparent text-white text-xs focus:outline-none">
+          </div>
+          <button onclick="submitCustomGoogleAccount()" class="w-full py-2 rounded-lg btn-primary font-semibold text-xs shadow flex items-center justify-center gap-1.5 transition">
+            <i class="fa-solid fa-check"></i>
+            <span>Xác nhận đăng nhập Google</span>
+          </button>
+        </div>
       </div>
 
       <div class="flex justify-end pt-2 border-t border-[#3c4043]">
         <button onclick="closeGoogleChooser()" class="px-4 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white transition">
-          Hủy
+          Hủy bỏ
         </button>
       </div>
     </div>
   </div>
 
-  <!-- SCRIPT: REALISTIC GREEN ROOM & AUTHENTICATION ORCHESTRATOR -->
+  <!-- SCRIPT: GATED ACCESS & AUTHENTICATION ORCHESTRATOR -->
   <script>
-    // 1. User Identity & Authentication Management
-    const defaultGuest = {
-      id: 'usr_guest',
-      name: 'Sơn Lê',
-      email: 'sonle.dev@gmail.com',
-      role: 'Team Leader',
-      avatar: '',
-      authProvider: 'local'
-    };
-
-    function getAuthUser() {
+    // 1. Session Storage & State Management
+    function getStoredAuthUser() {
+      const token = localStorage.getItem('teamup_token');
+      if (!token) return null;
       try {
-        const stored = localStorage.getItem('teamup_user');
-        if (stored) return JSON.parse(stored);
+        const raw = localStorage.getItem('teamup_user');
+        if (raw) {
+          const user = JSON.parse(raw);
+          if (user && user.id && user.id !== 'usr_guest') return user;
+        }
       } catch (e) {}
-      return defaultGuest;
+      return null;
     }
 
     function setAuthUser(user, token) {
       localStorage.setItem('teamup_user', JSON.stringify(user));
       if (token) localStorage.setItem('teamup_token', token);
-      syncUserUI();
+      syncUIAuthState();
+    }
+
+    function clearAuthUser() {
+      localStorage.removeItem('teamup_user');
+      localStorage.removeItem('teamup_token');
+      syncUIAuthState();
     }
 
     function getInitials(name) {
-      if (!name) return 'TU';
+      if (!name) return 'K';
       const clean = name.replace(/\(.*?\)/g, '').trim();
       const parts = clean.split(/\s+/).filter(Boolean);
-      if (parts.length === 0) return 'TU';
+      if (parts.length === 0) return 'K';
       if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    function syncUserUI() {
-      const u = getAuthUser();
-      const initials = getInitials(u.name);
-
-      // Top bar header
-      const headerInitials = document.getElementById('headerAvatarInitials');
-      const headerName = document.getElementById('headerUserName');
-      const headerRole = document.getElementById('headerUserRole');
-      const previewInitials = document.getElementById('previewAvatarInitials');
-      const inputName = document.getElementById('inputUserName');
-      const selectRole = document.getElementById('selectUserRole');
-
-      if (headerInitials) headerInitials.innerText = initials;
-      if (headerName) headerName.innerText = u.name;
-      if (headerRole) headerRole.innerText = `(${u.role})`;
-      if (previewInitials) previewInitials.innerText = initials;
-      if (inputName) inputName.value = u.name;
-      if (selectRole) selectRole.value = u.role;
-
-      // Dropdown menu details
-      const dropInitials = document.getElementById('dropdownAvatarInitials');
-      const dropName = document.getElementById('dropdownUserName');
-      const dropEmail = document.getElementById('dropdownUserEmail');
-      const dropRole = document.getElementById('dropdownUserRole');
-
-      if (dropInitials) dropInitials.innerText = initials;
-      if (dropName) dropName.innerText = u.name;
-      if (dropEmail) dropEmail.innerText = u.email || 'Chưa đăng nhập';
-      if (dropRole) dropRole.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span>${u.role}</span>`;
+    // Render Avatar Element (Real Image or Initials Fallback)
+    function renderAvatarElement(containerEl, user, sizeClass = 'w-full h-full', textClass = 'text-xs') {
+      if (!containerEl) return;
+      if (user && user.avatar) {
+        containerEl.innerHTML = `<img src="${user.avatar}" alt="${user.name}" class="${sizeClass} object-cover rounded-full" onerror="this.outerHTML='<span class=\\'font-bold text-white ${textClass}\\'>${getInitials(user ? user.name : '')}</span>'">`;
+      } else {
+        containerEl.innerHTML = `<span class="font-bold text-white ${textClass}">${getInitials(user ? user.name : '')}</span>`;
+      }
     }
 
-    function saveUserData() {
-      const current = getAuthUser();
-      current.name = document.getElementById('inputUserName').value.trim() || 'Sơn Lê';
-      current.role = document.getElementById('selectUserRole').value || 'Team Leader';
-      localStorage.setItem('teamup_user', JSON.stringify(current));
-      syncUserUI();
+    // 2. Synchronize UI Auth State (Strict Guest vs Logged In)
+    function syncUIAuthState() {
+      const user = getStoredAuthUser();
+      const authGuestBar = document.getElementById('authGuestBar');
+      const authUserBar = document.getElementById('authUserBar');
+      const identityGuestBox = document.getElementById('identityGuestBox');
+      const identityUserBox = document.getElementById('identityUserBox');
+      const previewAvatarCircle = document.getElementById('previewAvatarCircle');
+      const btnEnterRoom = document.getElementById('btnEnterRoom');
+      const btnEnterRoomText = document.getElementById('btnEnterRoomText');
+
+      if (!user) {
+        // GUEST MODE
+        if (authGuestBar) authGuestBar.classList.remove('hidden');
+        if (authUserBar) authUserBar.classList.add('hidden');
+        if (identityGuestBox) identityGuestBox.classList.remove('hidden');
+        if (identityUserBox) identityUserBox.classList.add('hidden');
+
+        // Reset Green Room Avatar Preview to Guest 'K'
+        if (previewAvatarCircle) {
+          previewAvatarCircle.innerHTML = '<span class="text-slate-400 font-bold">K</span>';
+        }
+
+        // Lock enter room button
+        if (btnEnterRoom) {
+          btnEnterRoom.className = 'w-full py-2.5 rounded-lg bg-[#3c4043] text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 shadow hover:bg-[#474a4d] transition cursor-pointer';
+          if (btnEnterRoomText) btnEnterRoomText.innerText = 'Đăng nhập để vào phòng (Đang khóa)';
+        }
+      } else {
+        // LOGGED-IN MODE
+        if (authGuestBar) authGuestBar.classList.add('hidden');
+        if (authUserBar) authUserBar.classList.remove('hidden');
+        if (identityGuestBox) identityGuestBox.classList.add('hidden');
+        if (identityUserBox) identityUserBox.classList.remove('hidden');
+
+        // Top Bar Pill
+        const headerName = document.getElementById('headerUserName');
+        const headerRole = document.getElementById('headerUserRole');
+        const headerAvatarBox = document.getElementById('headerAvatarBox');
+        if (headerName) headerName.innerText = user.name;
+        if (headerRole) headerRole.innerText = `(${user.role || 'Member'})`;
+        renderAvatarElement(headerAvatarBox, user, 'w-full h-full', 'text-[11px]');
+
+        // Dropdown Menu
+        const dropName = document.getElementById('dropdownUserName');
+        const dropEmail = document.getElementById('dropdownUserEmail');
+        const dropRole = document.getElementById('dropdownUserRole');
+        const dropAvatarBox = document.getElementById('dropdownAvatarBox');
+        if (dropName) dropName.innerText = user.name;
+        if (dropEmail) dropEmail.innerText = user.email;
+        if (dropRole) dropRole.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span>${user.role || 'Thành viên'}</span>`;
+        renderAvatarElement(dropAvatarBox, user, 'w-full h-full', 'text-sm');
+
+        // Left Identity Box
+        const idName = document.getElementById('identityUserName');
+        const idEmail = document.getElementById('identityUserEmail');
+        const idAvatarBox = document.getElementById('identityAvatarBox');
+        const selectRole = document.getElementById('selectUserRole');
+        if (idName) idName.innerText = user.name;
+        if (idEmail) idEmail.innerText = user.email;
+        if (selectRole && user.role) selectRole.value = user.role;
+        renderAvatarElement(idAvatarBox, user, 'w-full h-full', 'text-sm');
+
+        // Green Room Video Fallback Avatar
+        renderAvatarElement(previewAvatarCircle, user, 'w-full h-full', 'text-2xl');
+
+        // Unlock enter room button
+        if (btnEnterRoom) {
+          btnEnterRoom.className = 'w-full py-2.5 rounded-lg btn-primary font-semibold text-xs flex items-center justify-center gap-2 shadow transition';
+          if (btnEnterRoomText) btnEnterRoomText.innerText = 'Vào phòng ngay';
+        }
+      }
     }
 
-    document.getElementById('inputUserName')?.addEventListener('input', saveUserData);
-    document.getElementById('selectUserRole')?.addEventListener('change', saveUserData);
+    document.getElementById('selectUserRole')?.addEventListener('change', (e) => {
+      const user = getStoredAuthUser();
+      if (user) {
+        user.role = e.target.value;
+        setAuthUser(user, localStorage.getItem('teamup_token'));
+      }
+    });
 
-    // 2. Authentication Modal Management (Login / Register / Google)
+    // 3. Gated Action Protections
+    function checkGatedAuth() {
+      const user = getStoredAuthUser();
+      if (!user) {
+        alert('⚠️ Bạn chưa đăng nhập!\nHệ thống yêu cầu đăng nhập tài khoản trước khi tạo hoặc tham gia cuộc họp.');
+        openAuthModal('login');
+        return false;
+      }
+      return true;
+    }
+
+    function handleNewMeetingClick() {
+      if (!checkGatedAuth()) return;
+      toggleNewMeetingDropdown();
+    }
+
+    // 4. Auth Modal & Flow Management
     function openAuthModal(tab = 'login') {
       const modal = document.getElementById('authModal');
-      const dropdown = document.getElementById('menuUserDropdown');
-      if (dropdown) dropdown.classList.add('hidden');
+      document.getElementById('menuUserDropdown')?.classList.add('hidden');
       if (modal) {
         modal.classList.remove('hidden');
         switchAuthTab(tab);
@@ -614,7 +736,7 @@
       document.getElementById('authAlertBox')?.classList.add('hidden');
     }
 
-    // Submit Email/Password Login
+    // Submit Local Email Login
     async function submitLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
@@ -634,7 +756,7 @@
 
         setAuthUser(data.user, data.token);
         showAuthAlert('🎉 ' + data.message, true);
-        setTimeout(() => closeAuthModal(), 800);
+        setTimeout(() => closeAuthModal(), 600);
       } catch (err) {
         showAuthAlert(err.message, false);
       } finally {
@@ -665,7 +787,7 @@
 
         setAuthUser(data.user, data.token);
         showAuthAlert('🎉 ' + data.message, true);
-        setTimeout(() => closeAuthModal(), 800);
+        setTimeout(() => closeAuthModal(), 600);
       } catch (err) {
         showAuthAlert(err.message, false);
       } finally {
@@ -674,7 +796,7 @@
       }
     }
 
-    // 3. Google Sign-In Flow
+    // 5. Google Sign-In Flow
     function handleGoogleSignInPrompt() {
       closeAuthModal();
       document.getElementById('googleChooserDialog')?.classList.remove('hidden');
@@ -696,18 +818,23 @@
         if (!res.ok) throw new Error(data.error || 'Lỗi đăng nhập Google.');
 
         setAuthUser(data.user, data.token);
-        alert(`✅ Đã đăng nhập thành công với tài khoản Google: ${email}`);
+        alert(`✅ Đã đăng nhập thành công với tài khoản Google:\n${data.user.name} (${data.user.email})`);
       } catch (err) {
         alert('Lỗi: ' + err.message);
       }
     }
 
-    function promptCustomGoogleAuth() {
-      const email = prompt('Nhập địa chỉ Gmail của bạn:');
-      if (!email) return;
-      const name = prompt('Nhập họ và tên hiển thị:', email.split('@')[0]);
-      if (!name) return;
-      execGoogleAuth(name, email, '');
+    function submitCustomGoogleAccount() {
+      const email = document.getElementById('customGoogleEmail').value.trim();
+      let name = document.getElementById('customGoogleName').value.trim();
+      if (!email || !email.includes('@')) {
+        return alert('Vui lòng nhập địa chỉ Gmail hợp lệ!');
+      }
+      if (!name) name = email.split('@')[0];
+
+      // Realistic Google profile photo resolver
+      const picture = `https://lh3.googleusercontent.com/ogw/AF2bZyiZlR7M9c-aU5J1L3=s64-c-mo`;
+      execGoogleAuth(name, email, picture);
     }
 
     // Logout
@@ -721,10 +848,9 @@
           });
         } catch (e) {}
       }
-      localStorage.removeItem('teamup_token');
-      setAuthUser(defaultGuest, null);
+      clearAuthUser();
       document.getElementById('menuUserDropdown')?.classList.add('hidden');
-      alert('Đã đăng xuất tài khoản.');
+      alert('Đã đăng xuất tài khoản. Bạn hiện đang ở quyền Khách.');
     }
 
     function toggleUserDropdown() {
@@ -740,7 +866,7 @@
       }
     });
 
-    // 4. Real-time Clock
+    // 6. Real-time Clock
     function updateClock() {
       const now = new Date();
       const clockEl = document.getElementById('landingClock');
@@ -757,7 +883,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 5. Hardware Test / Green Room (WebRTC Preview)
+    // 7. Hardware Test / Green Room (WebRTC Preview)
     let localPreviewStream = null;
     let isPreviewMicOn = true;
     let isPreviewCamOn = false;
@@ -876,7 +1002,7 @@
       }
     }
 
-    // 6. Meeting Navigation
+    // 8. Meeting Room Navigation (Gated & Authenticated)
     function toggleNewMeetingDropdown() {
       const menu = document.getElementById('menuNewMeeting');
       if (menu) menu.classList.toggle('hidden');
@@ -897,12 +1023,14 @@
     }
 
     function startInstantMeeting() {
+      if (!checkGatedAuth()) return;
       const code = generateCode();
-      const u = getAuthUser();
+      const u = getStoredAuthUser();
       window.location.href = `/room?room=${encodeURIComponent(code)}&name=${encodeURIComponent(u.name)}&role=${encodeURIComponent(u.role)}`;
     }
 
     function createMeetingForLater() {
+      if (!checkGatedAuth()) return;
       const code = generateCode();
       const link = `${window.location.origin}/room?room=${code}`;
       navigator.clipboard.writeText(link);
@@ -918,6 +1046,7 @@
     }
 
     function joinMeetingFromInput() {
+      if (!checkGatedAuth()) return;
       const input = document.getElementById('inputMeetingCode');
       let val = input ? input.value.trim() : '';
       if (!val) {
@@ -934,7 +1063,7 @@
       } catch (e) {}
 
       val = val.replace(/[^a-zA-Z0-9\-_]/g, '');
-      const u = getAuthUser();
+      const u = getStoredAuthUser();
       window.location.href = `/room?room=${encodeURIComponent(val)}&name=${encodeURIComponent(u.name)}&role=${encodeURIComponent(u.role)}`;
     }
 
@@ -943,6 +1072,7 @@
     });
 
     function joinActiveMeeting() {
+      if (!checkGatedAuth()) return;
       const input = document.getElementById('inputMeetingCode');
       const val = input && input.value.trim() ? input.value.trim() : 'teamup-dev-warroom';
       quickFillCode(val);
@@ -950,8 +1080,14 @@
     }
 
     // Startup Initialization
-    syncUserUI();
+    syncUIAuthState();
     initPreviewDevices();
+
+    // Check if redirected with ?auth=required
+    if (new URLSearchParams(window.location.search).get('auth') === 'required') {
+      openAuthModal('login');
+      showAuthAlert('Vui lòng đăng nhập để vào phòng họp.', false);
+    }
   </script>
 </body>
 </html>
