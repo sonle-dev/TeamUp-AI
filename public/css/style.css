@@ -1,77 +1,77 @@
 :root {
-  /* Theme Base: Dark Default */
-  --bg-main: #121212;
-  --bg-tile: #202124;
-  --bg-panel: #1e1f20;
-  --bg-panel-sub: #191a1b;
-  --bg-input: #121212;
-  --bg-card: #282a2d;
-  --text-main: #e3e3e3;
+  /* Theme Base: Clean Google Meet Dark */
+  --bg-main: #202124;
+  --bg-tile: #292a2d;
+  --bg-panel: #202124;
+  --bg-panel-sub: #1e1f20;
+  --bg-input: #303134;
+  --bg-card: #303134;
+  --text-main: #e8eaed;
   --text-sub: #9aa0a6;
   --border-color: #3c4043;
   --btn-control: #3c4043;
   --btn-control-text: #ffffff;
   --btn-control-hover: #474a4d;
-  --header-bg: #121212;
-  --footer-bg: #121212;
+  --header-bg: #202124;
+  --footer-bg: #202124;
 
-  /* Dynamic Accent Palette (Default: Indigo / Purple) */
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: rgba(99, 102, 241, 0.15);
-  --primary-border: rgba(99, 102, 241, 0.4);
-  --primary-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+  /* Clean Professional Google Blue Accent */
+  --primary: #1a73e8;
+  --primary-hover: #1557b0;
+  --primary-light: rgba(26, 115, 232, 0.12);
+  --primary-border: #1a73e8;
+  --primary-gradient: #1a73e8;
 }
 
 /* Light Theme Override */
 .theme-light {
-  --bg-main: #f0f2f5;
-  --bg-tile: #ffffff;
+  --bg-main: #ffffff;
+  --bg-tile: #f8f9fa;
   --bg-panel: #ffffff;
-  --bg-panel-sub: #f8f9fa;
-  --bg-input: #f8f9fa;
+  --bg-panel-sub: #f1f3f4;
+  --bg-input: #f1f3f4;
   --bg-card: #f8f9fa;
   --text-main: #202124;
   --text-sub: #5f6368;
   --border-color: #dadce0;
-  --btn-control: #ffffff;
+  --btn-control: #f1f3f4;
   --btn-control-text: #3c4043;
-  --btn-control-hover: #f1f3f4;
+  --btn-control-hover: #e8eaed;
   --header-bg: #ffffff;
   --footer-bg: #ffffff;
 }
 
-/* Accent Palettes */
+/* Standard Accent Palettes */
 .palette-indigo {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: rgba(99, 102, 241, 0.15);
-  --primary-border: rgba(99, 102, 241, 0.4);
-  --primary-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+  --primary: #1a73e8;
+  --primary-hover: #1557b0;
+  --primary-light: rgba(26, 115, 232, 0.12);
+  --primary-border: #1a73e8;
+  --primary-gradient: #1a73e8;
 }
 
 .palette-emerald {
-  --primary: #10b981;
-  --primary-hover: #059669;
-  --primary-light: rgba(16, 185, 129, 0.15);
-  --primary-border: rgba(16, 185, 129, 0.4);
-  --primary-gradient: linear-gradient(135deg, #10b981, #06b6d4);
+  --primary: #0d904f;
+  --primary-hover: #0b8043;
+  --primary-light: rgba(13, 144, 79, 0.12);
+  --primary-border: #0d904f;
+  --primary-gradient: #0d904f;
 }
 
 .palette-blue {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: rgba(37, 99, 235, 0.15);
-  --primary-border: rgba(37, 99, 235, 0.4);
-  --primary-gradient: linear-gradient(135deg, #2563eb, #38bdf8);
+  --primary: #1a73e8;
+  --primary-hover: #1557b0;
+  --primary-light: rgba(26, 115, 232, 0.12);
+  --primary-border: #1a73e8;
+  --primary-gradient: #1a73e8;
 }
 
 .palette-orange {
-  --primary: #f97316;
-  --primary-hover: #ea580c;
-  --primary-light: rgba(249, 115, 22, 0.15);
-  --primary-border: rgba(249, 115, 22, 0.4);
-  --primary-gradient: linear-gradient(135deg, #f97316, #f59e0b);
+  --primary: #e37400;
+  --primary-hover: #b05a00;
+  --primary-light: rgba(227, 116, 0, 0.12);
+  --primary-border: #e37400;
+  --primary-gradient: #e37400;
 }
 
 body {
@@ -144,8 +144,12 @@ body {
 }
 
 .btn-primary {
-  background: var(--primary-gradient);
-  color: white;
+  background-color: var(--primary);
+  color: #ffffff;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
 }
 
 .text-primary-var { color: var(--primary); }
