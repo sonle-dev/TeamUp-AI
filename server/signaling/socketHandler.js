@@ -85,6 +85,30 @@ module.exports = function setupSignaling(io) {
       }
     });
 
+    // Active Speaker Volume / Speaking State Broadcast
+    socket.on('speaking-state', ({ roomId, isSpeaking }) => {
+      socket.to(roomId).emit('peer-speaking-state', {
+        peerId: socket.id,
+        isSpeaking: !!isSpeaking
+      });
+    });
+
+    // Camera On/Off State Broadcast
+    socket.on('cam-state', ({ roomId, isCamOn }) => {
+      socket.to(roomId).emit('peer-cam-state', {
+        peerId: socket.id,
+        isCamOn: !!isCamOn
+      });
+    });
+
+    // Microphone On/Off State Broadcast
+    socket.on('mic-state', ({ roomId, isMicOn }) => {
+      socket.to(roomId).emit('peer-mic-state', {
+        peerId: socket.id,
+        isMicOn: !!isMicOn
+      });
+    });
+
     // User leaves / disconnects
     socket.on('disconnecting', () => {
       for (const roomId of socket.rooms) {

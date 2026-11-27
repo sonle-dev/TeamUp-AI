@@ -3,7 +3,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Parse Room ID & User Info
+  // 1. Parse Room ID & User Info from URL
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room') || 'teamup-dev-warroom';
   const userName = urlParams.get('name') || 'Sơn Lê (Leader)';
@@ -11,6 +11,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const roomTitleEl = document.getElementById('roomTitleDisplay');
   if (roomTitleEl) roomTitleEl.innerText = roomId;
+
+  // Helper: Initials calculation (e.g. "Đức Nguyễn" -> "ĐN")
+  function getInitials(name) {
+    if (!name) return 'TU';
+    const clean = name.replace(/\(.*?\)/g, '').trim();
+    const parts = clean.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'TU';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  // Helper: Vibrant gradient palette for avatars
+  const avatarGradients = [
+    'bg-gradient-to-tr from-cyan-600 to-blue-600',
+    'bg-gradient-to-tr from-amber-600 to-rose-600',
+    'bg-gradient-to-tr from-emerald-600 to-teal-600',
+    'bg-gradient-to-tr from-purple-600 to-indigo-600',
+    'bg-gradient-to-tr from-fuchsia-600 to-pink-600',
+    'bg-gradient-to-tr from-indigo-600 to-violet-600'
+  ];
+  function getAvatarGradient(id) {
+    let hash = 0;
+    for (let i = 0; i < (id || '').length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const idx = Math.abs(hash) % avatarGradients.length;
+    return avatarGradients[idx];
+  }
+
+  // Update Local User Tile in UI
+  const localInitialsEl = document.getElementById('localInitials');
+  if (localInitialsEl) localInitialsEl.innerText = getInitials(userName);
+
+  const localUserTagEl = document.getElementById('localUserTag');
+  if (localUserTagEl) localUserTagEl.innerText = `${userName} (Bạn - ${userRole})`;
 
   // 2. Connect to Socket.io Signaling Server
   const socket = io();
@@ -25,43 +60,146 @@ document.addEventListener('DOMContentLoaded', async () => {
   const kanban = new KanbanBoard(socket, roomId, 'cardsContainer');
   window.kanban = kanban;
 
-  // 4. Remote Streams Handler
+  // 4. Remote Peers & Streams Manager
   const videoStage = document.getElementById('videoStage');
+  const copilotTile = document.getElementById('copilotTile');
   const remoteTiles = new Map(); // peerId -> element
+  const peerMetadata = new Map(); // peerId -> { id, name, role }
+
+  // Callback when local speaking state changes
+  const onSpeakingChange = (target, isSpeaking) => {
+    if (target === 'local') {
+      const localTile = document.getElementById('localTile');
+      if (localTile) {
+        localTile.classList.toggle('is-speaking', isSpeaking);
+      }
+    }
+  };
 
   const onStreamUpdate = (action, peerId, stream) => {
     if (action === 'add') {
       let tile = remoteTiles.get(peerId);
+      const info = peerMetadata.get(peerId) || { name: `Thành viên (${peerId.slice(0, 5)})`, role: 'Thành viên' };
+      const initials = getInitials(info.name);
+      const gradient = getAvatarGradient(peerId);
+
       if (!tile) {
         tile = document.createElement('div');
         tile.className = 'tile group';
         tile.id = `peer-tile-${peerId}`;
         tile.innerHTML = `
-          <video autoplay playsinline class="w-full h-full object-cover"></video>
+          <video autoplay playsinline class="w-full h-full object-cover hidden"></video>
+
+          <div class="peer-avatar flex flex-col items-center justify-center gap-3">
+            <div class="w-24 h-24 rounded-full ${gradient} flex items-center justify-center text-3xl font-bold text-white shadow-xl ring-4" style="ring-color: var(--border-color);">
+              ${initials}
+            </div>
+            <div class="flex items-center gap-1.5 text-xs" style="color: var(--text-sub);">
+              <span class="px-2 py-0.5 rounded font-mono text-[10px] border text-primary-var bg-primary-light" style="border-color: var(--primary-border);">${info.role}</span>
+            </div>
+            <span class="text-xs font-medium peer-cam-status" style="color: var(--text-sub);">Camera đang tắt</span>
+          </div>
+
           <div class="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-xs text-white">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span class="peer-name">Thành viên (${peerId.slice(0, 5)})</span>
-            <i class="fa-solid fa-microphone text-[10px] text-slate-300 ml-1"></i>
+            <span class="peer-name">${info.name}</span>
+            <i class="peer-mic-icon fa-solid fa-microphone text-[10px] text-slate-300 ml-1"></i>
           </div>
         `;
-        videoStage.appendChild(tile);
+
+        if (copilotTile && copilotTile.parentNode === videoStage) {
+          videoStage.insertBefore(tile, copilotTile);
+        } else {
+          videoStage.appendChild(tile);
+        }
         remoteTiles.set(peerId, tile);
       }
+
       const video = tile.querySelector('video');
-      if (video) video.srcObject = stream;
+      const avatar = tile.querySelector('.peer-avatar');
+      if (video && stream) {
+        video.srcObject = stream;
+
+        const syncStreamState = () => {
+          const videoTracks = stream.getVideoTracks();
+          const hasActiveVideo = videoTracks.length > 0 && videoTracks.some(t => t.enabled && t.readyState === 'live');
+          if (hasActiveVideo) {
+            video.classList.remove('hidden');
+            if (avatar) avatar.classList.add('hidden');
+          } else {
+            video.classList.add('hidden');
+            if (avatar) avatar.classList.remove('hidden');
+          }
+        };
+
+        stream.getVideoTracks().forEach(track => {
+          track.onmute = syncStreamState;
+          track.onunmute = syncStreamState;
+          track.onended = syncStreamState;
+        });
+
+        syncStreamState();
+      }
     } else if (action === 'remove') {
       const tile = remoteTiles.get(peerId);
       if (tile) {
         tile.remove();
         remoteTiles.delete(peerId);
       }
+      peerMetadata.delete(peerId);
     }
   };
 
-  // 5. Initialize WebRTC
-  const webrtc = new WebRTCManager(socket, roomId, userName, onStreamUpdate);
+  // 5. Initialize WebRTC Manager
+  const webrtc = new WebRTCManager(socket, roomId, userName, onStreamUpdate, onSpeakingChange);
   window.webrtc = webrtc;
   await webrtc.initLocalStream();
+
+  // Socket: User Metadata & Speaking/Camera Synchronization
+  socket.on('room-joined', ({ yourId, peers }) => {
+    peers.forEach(p => peerMetadata.set(p.id, p));
+  });
+
+  socket.on('peer-joined', (peer) => {
+    peerMetadata.set(peer.id, peer);
+  });
+
+  // Real-Time Active Speaker Visual Indicator
+  socket.on('peer-speaking-state', ({ peerId, isSpeaking }) => {
+    const tile = document.getElementById(`peer-tile-${peerId}`);
+    if (tile) {
+      tile.classList.toggle('is-speaking', !!isSpeaking);
+    }
+  });
+
+  // Real-Time Peer Camera Toggle Synchronization
+  socket.on('peer-cam-state', ({ peerId, isCamOn }) => {
+    const tile = document.getElementById(`peer-tile-${peerId}`);
+    if (tile) {
+      const video = tile.querySelector('video');
+      const avatar = tile.querySelector('.peer-avatar');
+      if (isCamOn) {
+        if (video) video.classList.remove('hidden');
+        if (avatar) avatar.classList.add('hidden');
+      } else {
+        if (video) video.classList.add('hidden');
+        if (avatar) avatar.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Real-Time Peer Microphone Toggle Synchronization
+  socket.on('peer-mic-state', ({ peerId, isMicOn }) => {
+    const tile = document.getElementById(`peer-tile-${peerId}`);
+    if (tile) {
+      const micIcon = tile.querySelector('.peer-mic-icon');
+      if (micIcon) {
+        micIcon.className = isMicOn
+          ? 'peer-mic-icon fa-solid fa-microphone text-[10px] text-slate-300 ml-1'
+          : 'peer-mic-icon fa-solid fa-microphone-slash text-[10px] text-rose-400 ml-1';
+      }
+    }
+  });
 
   // Join Room
   socket.emit('join-room', { roomId, userName, userRole });
@@ -149,17 +287,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  window.toggleCam = function() {
-    const isOn = webrtc.toggleCam();
+  window.toggleCam = async function() {
     const btn = document.getElementById('btnCam');
     const localVideo = document.getElementById('localVideo');
     const localAvatar = document.getElementById('localAvatar');
 
-    if (isOn) {
+    const res = await webrtc.toggleCam();
+    if (res.isCamOn) {
       btn.classList.remove('active');
       btn.innerHTML = '<i class="fa-solid fa-video text-sm"></i>';
       if (localVideo) {
-        localVideo.srcObject = webrtc.localStream;
+        localVideo.srcObject = res.stream;
         localVideo.classList.remove('hidden');
       }
       if (localAvatar) localAvatar.classList.add('hidden');
