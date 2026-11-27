@@ -3,11 +3,18 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Parse Room ID & User Info from URL
+  // 1. Parse Room ID & User Info from URL or Authenticated Session
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room') || 'teamup-dev-warroom';
-  const userName = urlParams.get('name') || 'Sơn Lê (Leader)';
-  const userRole = urlParams.get('role') || 'Team Leader';
+
+  let savedUser = null;
+  try {
+    const raw = localStorage.getItem('teamup_user');
+    if (raw) savedUser = JSON.parse(raw);
+  } catch (e) {}
+
+  const userName = urlParams.get('name') || (savedUser ? savedUser.name : 'Sơn Lê');
+  const userRole = urlParams.get('role') || (savedUser ? savedUser.role : 'Team Leader');
 
   const roomTitleEl = document.getElementById('roomTitleDisplay');
   if (roomTitleEl) roomTitleEl.innerText = roomId;

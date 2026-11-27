@@ -1,0 +1,46 @@
+[
+  {
+    "id": "usr_sonle",
+    "name": "Sơn Lê",
+    "email": "sonle.dev@gmail.com",
+    "role": "Team Leader",
+    "salt": "a1b2c3d4e5f67890a1b2c3d4e5f67890",
+    "hash": "b4c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8",
+    "avatar": "",
+    "authProvider": "local",
+    "createdAt": "2026-11-20T08:00:00.000Z"
+  },
+  {
+    "id": "usr_ducnguyen",
+    "name": "Đức Nguyễn",
+    "email": "duc.nguyen@teamup.io",
+    "role": "Backend Dev",
+    "salt": "f1e2d3c4b5a67890f1e2d3c4b5a67890",
+    "hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "avatar": "",
+    "authProvider": "local",
+    "createdAt": "2026-11-21T09:00:00.000Z"
+  },
+  {
+    "id": "usr_gg_2f7d8692558d",
+    "name": "Sơn Lê (Google)",
+    "email": "sonle.google@gmail.com",
+    "role": "Fullstack Dev",
+    "salt": "",
+    "hash": "",
+    "avatar": "https://lh3.googleusercontent.com/a/default-user",
+    "authProvider": "google",
+    "createdAt": "2026-11-27T17:05:21.130Z"
+  },
+  {
+    "id": "usr_10aa90527bf6",
+    "name": "Minh Hoàng",
+    "email": "hoang.minh@teamup.io",
+    "role": "Frontend Dev",
+    "salt": "b47bd2a4bd53aa1af6d2b93261020df8",
+    "hash": "f1e72f1b6058884d352817442a856cf8eead8f1068b56b23e7aa2d54be45049169d1a10b5143faf402df783180d47570137410c769a1a88164220f9dd077d9a4",
+    "avatar": "",
+    "authProvider": "local",
+    "createdAt": "2026-11-27T17:05:26.238Z"
+  }
+]
