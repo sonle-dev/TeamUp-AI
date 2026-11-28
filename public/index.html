@@ -472,67 +472,107 @@
     </div>
   </div>
 
-  <!-- GOOGLE ACCOUNT SELECTOR DIALOG (Authentic Real Google Account Login - Exact Match Image 2) -->
+  <!-- GOOGLE OAUTH 2.0 STANDARD AUTHENTICATION MODAL -->
   <div id="googleChooserDialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
-    <div class="w-full max-w-xl rounded-3xl border border-[#444746] p-8 shadow-2xl relative space-y-6" style="background-color: #2b2b2b;">
-      <div class="flex items-center gap-3">
-        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-        </svg>
-        <span class="text-sm font-medium text-slate-200">Đăng nhập bằng Google</span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <!-- Left Column -->
-        <div>
-          <h2 class="text-2xl font-normal text-white mb-2">Chọn tài khoản</h2>
-          <p class="text-xs text-slate-400">Tiếp tục tới <span class="text-[#a8c7fa] font-medium">TeamUp AI</span></p>
-        </div>
-
-        <!-- Right Column: Account items -->
-        <div class="border-t border-[#444746] divide-y divide-[#444746]">
-          <!-- Real Google Account of Sơn Lê from Image 2 -->
-          <div onclick="execGoogleAuth('Sơn Lê', 'lehongson270920050@gmail.com', '/images/google_avatar.png')" 
-            class="flex items-center gap-3 py-3 px-2 rounded-lg hover:bg-white/5 cursor-pointer transition">
-            <img src="/images/google_avatar.png" alt="Sơn Lê" class="w-9 h-9 rounded-full object-cover shrink-0" onerror="this.outerHTML='<div class=\'w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0\'>SL</div>'">
-            <div class="overflow-hidden">
-              <div class="text-xs font-semibold text-white truncate">Sơn Lê</div>
-              <div class="text-[11px] text-slate-400 truncate">lehongson270920050@gmail.com</div>
-            </div>
-          </div>
-
-          <!-- Secondary Account: Đức Nguyễn -->
-          <div onclick="execGoogleAuth('Đức Nguyễn', 'duc.nguyen@teamup.io', '')" 
-            class="flex items-center gap-3 py-3 px-2 rounded-lg hover:bg-white/5 cursor-pointer transition">
-            <div class="w-9 h-9 rounded-full bg-[#0b8043] flex items-center justify-center text-white font-bold text-xs shrink-0">ĐN</div>
-            <div class="overflow-hidden">
-              <div class="text-xs font-semibold text-white truncate">Đức Nguyễn</div>
-              <div class="text-[11px] text-slate-400 truncate">duc.nguyen@teamup.io</div>
-            </div>
-          </div>
-
-          <!-- Use another account -->
-          <div onclick="promptOtherGoogleAccount()" 
-            class="flex items-center gap-3 py-3 px-2 rounded-lg hover:bg-white/5 cursor-pointer transition">
-            <div class="w-9 h-9 rounded-full border border-[#5f6368] flex items-center justify-center text-slate-400 shrink-0">
-              <i class="fa-solid fa-user-plus text-xs"></i>
-            </div>
-            <span class="text-xs font-medium text-slate-200">Sử dụng một tài khoản khác</span>
+    <div class="w-full max-w-xl rounded-3xl border border-[#444746] p-7 shadow-2xl relative space-y-6" style="background-color: #2b2b2b;">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-[#444746]">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <div>
+            <h2 class="text-base font-semibold text-white">Xác thực tài khoản Google (OAuth 2.0 Chuẩn)</h2>
+            <p class="text-[11px] text-slate-400">Kết nối trực tiếp dịch vụ tài khoản <span class="text-[#a8c7fa] font-mono">accounts.google.com</span></p>
           </div>
         </div>
+        <button onclick="closeGoogleChooser()" class="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
       </div>
 
-      <div class="flex items-center justify-between pt-4 border-t border-[#444746] text-[11px] text-slate-400">
-        <span>Tiếng Việt</span>
+      <!-- Notice explanation about Google OAuth architecture -->
+      <div class="p-3.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-xs text-slate-300 leading-relaxed space-y-2">
+        <div class="flex items-center gap-2 text-[#a8c7fa] font-semibold">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Cơ chế bảo mật chính thức của Google:</span>
+        </div>
+        <p>
+          Để mở trang xác thực chính thức trên miền <code class="text-amber-300 font-mono">accounts.google.com</code> (như trong ảnh mẫu của bạn), Google bắt buộc ứng dụng phải đăng ký một <b>Google Client ID</b> trên Google Cloud Console để ủy quyền cho miền <code class="text-amber-300 font-mono">http://localhost:5000</code>.
+        </p>
+      </div>
+
+      <!-- Action 1: Real OAuth to accounts.google.com -->
+      <div class="space-y-3">
+        <label class="block text-xs font-semibold text-white">Lựa chọn 1: Chuyển hướng tới accounts.google.com chính thức</label>
+        
+        <div id="googleClientConfigBox" class="space-y-2">
+          <div class="flex gap-2">
+            <input type="text" id="inputGoogleClientId" placeholder="Nhập Google Client ID (ví dụ: xxxx.apps.googleusercontent.com)..." 
+              class="flex-1 px-3 py-2 rounded-xl border border-[#444746] bg-[#1f1f1f] text-white text-xs focus:outline-none focus:border-[#a8c7fa]">
+            <button onclick="saveAndLaunchGoogleOAuth()" class="px-4 py-2 rounded-xl bg-[#1a73e8] hover:bg-[#1b66c9] text-white font-semibold text-xs transition flex items-center gap-1.5 shrink-0">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>Mở accounts.google.com</span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-[#a8c7fa] hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Lấy Client ID miễn phí tại Google Cloud Console
+            </a>
+            <span class="text-slate-500">Redirect URI: <code class="text-slate-300 font-mono">/api/auth/google/callback</code></span>
+          </div>
+        </div>
+
+        <div id="googleConfiguredBtnBox" class="hidden">
+          <button onclick="openRealGoogleOAuthWindow()" class="w-full py-2.5 rounded-xl bg-[#1a73e8] hover:bg-[#1b66c9] text-white font-semibold text-xs shadow transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Mở ngay màn hình đăng nhập accounts.google.com</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="relative flex items-center justify-center my-1">
+        <div class="border-t border-[#444746] w-full"></div>
+        <span class="bg-[#2b2b2b] px-3 text-[11px] text-slate-400 absolute">hoặc vào nhanh khi đang phát triển</span>
+      </div>
+
+      <!-- Action 2: Instant Dev Login with Real Google Credentials & Avatar -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-white">Lựa chọn 2: Đăng nhập ngay với tài khoản Google thật của bạn (Dev)</label>
+        
+        <div onclick="execGoogleAuth('Sơn Lê', 'lehongson270920050@gmail.com', '/images/google_avatar.png')" 
+          class="flex items-center justify-between p-3 rounded-2xl border border-[#444746] hover:border-[#a8c7fa] hover:bg-white/5 cursor-pointer transition">
+          <div class="flex items-center gap-3">
+            <img src="/images/google_avatar.png" alt="Sơn Lê" class="w-10 h-10 rounded-full object-cover shrink-0 border border-slate-600" onerror="this.outerHTML='<div class=\'w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0\'>SL</div>'">
+            <div>
+              <div class="text-xs font-semibold text-white flex items-center gap-1.5">
+                <span>Sơn Lê</span>
+                <span class="px-1.5 py-0.2 rounded bg-blue-500/20 text-[#a8c7fa] text-[10px]">Tài khoản thật</span>
+              </div>
+              <div class="text-[11px] text-slate-400">lehongson270920050@gmail.com</div>
+            </div>
+          </div>
+          <span class="text-xs font-semibold text-[#a8c7fa] flex items-center gap-1">
+            <span>Vào họp ngay</span>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Footer Links -->
+      <div class="flex items-center justify-between pt-3 border-t border-[#444746] text-[11px] text-slate-400">
         <div class="flex gap-4">
-          <a href="https://support.google.com/accounts" target="_blank" class="hover:text-white">Trợ giúp</a>
-          <a href="https://policies.google.com/privacy" target="_blank" class="hover:text-white">Quyền riêng tư</a>
-          <button onclick="closeGoogleChooser()" class="hover:text-white ml-2">Đóng</button>
+          <a href="https://support.google.com/accounts" target="_blank" class="hover:text-white">Trợ giúp Google</a>
+          <a href="https://policies.google.com/privacy" target="_blank" class="hover:text-white">Chính sách bảo mật</a>
         </div>
+        <button onclick="closeGoogleChooser()" class="text-slate-400 hover:text-white">Đóng cửa sổ</button>
       </div>
+
     </div>
   </div>
 
@@ -792,22 +832,72 @@
     }
 
     // 5. Authentic Google Sign-In Flow
-    function handleGoogleSignInPrompt() {
+    let activeGoogleClientId = '';
+
+    async function checkGoogleConfig() {
+      try {
+        const res = await fetch('/api/auth/google/config');
+        const data = await res.json();
+        if (data && data.clientId) {
+          activeGoogleClientId = data.clientId;
+          document.getElementById('googleConfiguredBtnBox')?.classList.remove('hidden');
+          document.getElementById('inputGoogleClientId')?.setAttribute('value', data.clientId);
+        }
+      } catch (e) {}
+    }
+
+    async function handleGoogleSignInPrompt() {
       closeAuthModal();
-      const width = 600;
-      const height = 640;
+      
+      try {
+        const res = await fetch('/api/auth/google/config');
+        const data = await res.json();
+        if (data && data.clientId) {
+          activeGoogleClientId = data.clientId;
+          openRealGoogleOAuthWindow(data.clientId);
+          return;
+        }
+      } catch (e) {}
+
+      // If Google Client ID not yet set, open the standard Google OAuth setup dialog
+      document.getElementById('googleChooserDialog')?.classList.remove('hidden');
+    }
+
+    function openRealGoogleOAuthWindow(clientId) {
+      const cid = clientId || activeGoogleClientId;
+      if (!cid) {
+        document.getElementById('googleChooserDialog')?.classList.remove('hidden');
+        return;
+      }
+      const redirectUri = `${window.location.origin}/api/auth/google/callback`;
+      const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(cid)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20profile%20email&prompt=select_account`;
+      const width = 560;
+      const height = 660;
       const left = Math.max(0, Math.round((window.innerWidth - width) / 2 + window.screenX));
       const top = Math.max(0, Math.round((window.innerHeight - height) / 2 + window.screenY));
-      
-      const popup = window.open(
-        '/google-oauth.html',
-        'GoogleSignIn',
-        `width=${width},height=${height},top=${top},left=${left},status=no,menubar=no,toolbar=no`
-      );
+      window.open(googleUrl, 'GoogleSignIn', `width=${width},height=${height},top=${top},left=${left}`);
+    }
 
-      // If popup was blocked by browser, open the in-page Google Chooser dialog
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        document.getElementById('googleChooserDialog')?.classList.remove('hidden');
+    async function saveAndLaunchGoogleOAuth() {
+      const input = document.getElementById('inputGoogleClientId');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        alert('Vui lòng dán Google Client ID của bạn từ Google Cloud Console (ví dụ: xxxx.apps.googleusercontent.com)');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/google/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: val })
+        });
+        const data = await res.json();
+        activeGoogleClientId = val;
+        closeGoogleChooser();
+        openRealGoogleOAuthWindow(val);
+      } catch (e) {
+        alert('Lỗi lưu Google Client ID: ' + e.message);
       }
     }
 
@@ -1105,6 +1195,7 @@
     // Startup Initialization
     syncUIAuthState();
     initPreviewDevices();
+    checkGoogleConfig();
 
     // Check if redirected with ?auth=required
     if (new URLSearchParams(window.location.search).get('auth') === 'required') {
