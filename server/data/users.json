@@ -42,5 +42,16 @@
     "avatar": "",
     "authProvider": "local",
     "createdAt": "2026-11-27T17:05:26.238Z"
+  },
+  {
+    "id": "usr_gg_22b801ee0991",
+    "name": "gggggggg",
+    "email": "lehongson270920050@gmail.com",
+    "role": "Fullstack Dev",
+    "salt": "",
+    "hash": "",
+    "avatar": "https://lh3.googleusercontent.com/ogw/AF2bZyiZlR7M9c-aU5J1L3=s64-c-mo",
+    "authProvider": "google",
+    "createdAt": "2026-11-28T05:25:59.868Z"
   }
 ]
